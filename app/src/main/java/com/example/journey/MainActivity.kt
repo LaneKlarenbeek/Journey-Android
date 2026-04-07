@@ -43,7 +43,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Outline
 
 class MainActivity : ComponentActivity() {
@@ -51,8 +54,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            JourneyTheme {
-                Login()
+            JourneyTheme(darkTheme = true) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Login()
+                }
             }
         }
     }
@@ -88,7 +96,6 @@ fun Login(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedButton(
             onClick = { /*TODO*/ },
-            //colors = ButtonDefaults.buttonColors(Color(0xFF927155)),
             border = BorderStroke(2.dp, Color(0xFF927155)),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
@@ -106,7 +113,6 @@ fun Login(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedButton(
             onClick = { /*TODO*/ },
-            //colors = ButtonDefaults.buttonColors(Color(0xFF927155)),
             border = BorderStroke(2.dp, Color(0xFF927155)),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier,
@@ -127,5 +133,3 @@ fun Login(modifier: Modifier = Modifier) {
 fun LoginPreview(){
     Login()
 }
-
-//Create Account Button Logic
