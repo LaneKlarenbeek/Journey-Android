@@ -2,6 +2,7 @@ package com.example.journey
 
 import android.graphics.fonts.FontStyle
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,30 +39,29 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import android.view.View
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+class LoginScreen : ComponentActivity(){
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
         enableEdgeToEdge()
         setContent {
             JourneyTheme {
-                Login()
+
             }
         }
     }
 }
 
+/*
 @Composable
 fun Login(modifier: Modifier = Modifier) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
         .fillMaxSize()
-        .windowInsetsPadding(WindowInsets.statusBars),
-        verticalArrangement = Arrangement.Center,
-    ) {
+        .windowInsetsPadding(WindowInsets.statusBars)) {
+
         Spacer(modifier = Modifier.height(23.dp))
         Box(
             modifier = Modifier
@@ -79,38 +79,30 @@ fun Login(modifier: Modifier = Modifier) {
                 lineHeight = 36.sp,
             )
         }
-
-        //Logic for Create Account button
         Spacer(modifier = Modifier.height(12.dp))
-        Button(
-            onClick = { /*TODO*/ },
-            colors = ButtonDefaults.buttonColors(Color(0xFF927155)),
-            shape = RoundedCornerShape(12.dp),
+        Box(
             modifier = Modifier
-
+                .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                .padding(top = 6.dp, bottom = 6.dp, start = 16.dp, end = 16.dp)
         ) {
             Text(
                 text = "Create Account",
+                modifier = Modifier.padding(8.dp),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
             )
         }
-        //Logic for Login button
-
         Spacer(modifier = Modifier.height(12.dp))
-        Button(
-            onClick = { /*TODO*/ },
-            colors = ButtonDefaults.buttonColors(Color(0xFF927155)),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier,
-
+        Box(
+            modifier = Modifier
+                .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                .padding(top = 6.dp, bottom = 6.dp, start = 16.dp, end = 16.dp)
         ) {
             Text(
                 text = "Login",
+                modifier = Modifier.padding(8.dp),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
             )
         }
     }
@@ -120,3 +112,4 @@ fun Login(modifier: Modifier = Modifier) {
 fun LoginPreview(){
     Login()
 }
+*/
