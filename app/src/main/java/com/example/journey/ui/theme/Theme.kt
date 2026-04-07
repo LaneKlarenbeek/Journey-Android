@@ -2,6 +2,7 @@ package com.example.journey.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.annotation.Nullable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,7 +42,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun JourneyTheme(
-    darkTheme: Boolean = /*isSystemInDarkTheme()*/ false,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -59,20 +60,6 @@ fun JourneyTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = {
-            val backgroundModifier = if (darkTheme) {
-                Modifier
-                    .fillMaxSize()
-                    .background(brush = Brush.verticalGradient(listOf(Color(0xFFD0AE90), Color(0xFF896A4E))))
-            } else {
-                Modifier
-                    .fillMaxSize()
-                    .background(color = colorScheme.background)
-            }
-
-            Surface(modifier = backgroundModifier) {
-                content()
-            }
-        }
+        content = content
     )
 }
