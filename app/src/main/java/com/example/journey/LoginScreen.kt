@@ -25,9 +25,7 @@ fun LoginScreen(){
         .windowInsetsPadding(WindowInsets.statusBars),
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(
-            text = "This is the Login Screen"
-        )
+        ComingSoon()
     }
 }
 

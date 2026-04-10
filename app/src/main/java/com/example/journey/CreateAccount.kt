@@ -25,9 +25,7 @@ fun CreateAccount(){
         .windowInsetsPadding(WindowInsets.statusBars),
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(
-            text = "This is the Create Account Screen"
-        )
+        ComingSoon()
     }
 }
 
