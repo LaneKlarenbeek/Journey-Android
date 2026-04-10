@@ -1,5 +1,6 @@
 package com.example.journey
 
+import android.R
 import android.graphics.fonts.FontStyle
 import android.os.Bundle
 import android.widget.TextView
@@ -43,11 +44,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Outline
+import androidx.navigation.NavHost
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +61,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             JourneyTheme(darkTheme = false) {
+
+                //Main controller for initial navigation through Startup menu's
+                val navController = rememberNavController()
+
+                //Primary Surface styled for background.
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -70,7 +81,29 @@ class MainActivity : ComponentActivity() {
                         ),
                     color = Color.Transparent
                 ) {
-                    Login()
+
+                    NavHost(navController = navController, startDestination = "Login"){
+                        composable("Login"){
+                            Login(
+                                onLoginClick = { navController.navigate("LoginScreen") },
+                                onCreateAccountClick = { navController.navigate("CreateAccount") },
+                                onGuestClick = { navController.navigate("HomePage") }
+                            )
+                        }
+
+                        composable("LoginScreen"){
+                            LoginScreen()
+                        }
+
+                        composable("CreateAccount"){
+                            CreateAccount()
+                        }
+
+                        composable("HomePage"){
+                            HomePage()
+                        }
+
+                    }
                 }
             }
         }
@@ -78,7 +111,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Login(modifier: Modifier = Modifier) {
+fun Login(
+    modifier: Modifier = Modifier,
+    onLoginClick: () -> Unit = {},
+    onCreateAccountClick: () -> Unit = {},
+    onGuestClick: () -> Unit = {}
+) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
         //.fillMaxSize()
@@ -89,7 +127,7 @@ fun Login(modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
-                .padding(14.dp)
+                .padding(14.dp),
         ) {
             Text(
                 text = "Welcome to Jou(R)ney!",
@@ -103,31 +141,14 @@ fun Login(modifier: Modifier = Modifier) {
             )
         }
 
-        //Logic for Create Account button
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedButton(
-            onClick = { /*TODO*/ },
-            border = BorderStroke(2.dp, Color(0xFF927155)),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-
-        ) {
-            Text(
-                text = "Create Account",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-            )
-        }
         //Logic for Login button
-
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedButton(
-            onClick = { /*TODO*/ },
-            border = BorderStroke(2.dp, Color(0xFF927155)),
+        ElevatedButton(
+            onClick = onLoginClick,
+            //border = BorderStroke(2.dp, Color(0xFF927155)),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier,
-
+            colors = ButtonDefaults.elevatedButtonColors(containerColor = Color(0xFF927155), contentColor = Color.White)
         ) {
             Text(
                 text = "Login",
@@ -136,9 +157,42 @@ fun Login(modifier: Modifier = Modifier) {
                 color = Color.Black,
             )
         }
+
+        //Logic for Create Account button
+        Spacer(modifier = Modifier.height(12.dp))
+        ElevatedButton(
+            onClick = onCreateAccountClick,
+            //border = BorderStroke(2.dp, Color(0xFF927155)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier,
+            colors = ButtonDefaults.elevatedButtonColors(containerColor = Color(0xFF927155), contentColor = Color.White)
+        ) {
+            Text(
+                text = "Create Account",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+            )
+        }
+
+        //Continue as Guest button
+        Spacer(modifier = Modifier.height(12.dp))
+        ElevatedButton(
+            onClick = onGuestClick,
+            //border = BorderStroke(2.dp, Color(0xFF927155)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier,
+            colors = ButtonDefaults.elevatedButtonColors(containerColor = Color(0xFF927155), contentColor = Color.White)
+        ) {
+            Text(
+                text = "Continue as Guest",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+            )
+        }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

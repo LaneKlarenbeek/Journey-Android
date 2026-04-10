@@ -17,23 +17,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.journey.ui.theme.JourneyTheme
 
-//Code for "Login" Page
 @Composable
-fun LoginScreen(){
+fun HomePage(){
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
         //.fillMaxSize()
         .windowInsetsPadding(WindowInsets.statusBars),
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "This is the Login Screen"
+            text = "This is the Home Page"
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview(){
+fun HomePagePreview(){
     JourneyTheme(darkTheme = false, dynamicColor = false) {
         Surface(
             modifier = Modifier
@@ -50,7 +49,9 @@ fun LoginScreenPreview(){
                 ),
             color = Color.Transparent
         ) {
-            LoginScreen()
+            HomePage()
         }
     }
 }
+
+
