@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("HomePage"){
-                            HomePage()
+                            TransitionPage()
                         }
 
                     }

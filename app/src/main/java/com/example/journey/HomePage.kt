@@ -2,20 +2,154 @@ package com.example.journey
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Label
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.journey.ui.theme.JourneyTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+
+
+
+@Composable
+fun TransitionPage(){
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+    ) {
+        Box(
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                .padding(14.dp),
+        ) {
+            Text(
+                text = "Welcome User!",
+                modifier = Modifier
+                    .width(200.dp)
+                    .fillMaxWidth(),
+                fontSize = 34.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 36.sp,
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Box(
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                .padding(14.dp),
+        ) {
+            Text(
+                text = "To Get Started... Please enter the following information.",
+                modifier = Modifier
+                    .width(200.dp)
+                    .fillMaxWidth(),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 36.sp,
+            )
+        }
+
+        var firstName by remember { mutableStateOf("") }
+        var lastName by remember { mutableStateOf("") }
+
+
+        TextField(
+            value = firstName,
+            onValueChange = {newText -> firstName = newText},
+            label = { Text("First Name") },
+            shape = RoundedCornerShape(12),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF927155),
+                unfocusedContainerColor = Color(0xFF927155),
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color.Black,
+                unfocusedLabelColor = Color.LightGray,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            modifier = Modifier
+                .padding(12.dp),
+        )
+
+        TextField(
+            value = lastName,
+            onValueChange = {newText -> lastName = newText},
+            label = { Text("Last Name") },
+            shape = RoundedCornerShape(12),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF927155),
+                unfocusedContainerColor = Color(0xFF927155),
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color.Black,
+                unfocusedLabelColor = Color.LightGray,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            modifier = Modifier
+                .padding(12.dp),
+        )
+
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TransitionPagePreview(){
+    JourneyTheme(darkTheme = false, dynamicColor = false) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            Color(0xFFD0AE90),
+                            Color(0xFF896A4E),
+                        ),
+                        startY = 0.0f,
+                        endY = Float.POSITIVE_INFINITY
+                    )
+                ),
+            color = Color.Transparent
+        ) {
+            TransitionPage()
+        }
+    }
+}
+
 
 @Composable
 fun HomePage(){
@@ -24,9 +158,7 @@ fun HomePage(){
         .windowInsetsPadding(WindowInsets.statusBars),
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(
-            text = "This is the Home Page"
-        )
+        ComingSoon()
     }
 }
 
