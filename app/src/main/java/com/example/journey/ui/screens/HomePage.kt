@@ -1,4 +1,4 @@
-package com.example.journey
+package com.example.journey.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,12 +14,9 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Label
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -84,7 +81,7 @@ fun TransitionPage(){
         var firstName by remember { mutableStateOf("") }
         var lastName by remember { mutableStateOf("") }
 
-
+        //First Name Text Field
         TextField(
             value = firstName,
             onValueChange = {newText -> firstName = newText},
@@ -96,7 +93,7 @@ fun TransitionPage(){
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black,
                 focusedLabelColor = Color.Black,
-                unfocusedLabelColor = Color.LightGray,
+                unfocusedLabelColor = Color.Black,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -104,6 +101,7 @@ fun TransitionPage(){
                 .padding(12.dp),
         )
 
+        //Last Name Text Field
         TextField(
             value = lastName,
             onValueChange = {newText -> lastName = newText},
@@ -115,7 +113,7 @@ fun TransitionPage(){
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black,
                 focusedLabelColor = Color.Black,
-                unfocusedLabelColor = Color.LightGray,
+                unfocusedLabelColor = Color.Black,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
