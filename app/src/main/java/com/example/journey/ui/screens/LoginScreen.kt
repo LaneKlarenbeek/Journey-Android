@@ -19,12 +19,30 @@ import com.example.journey.ui.theme.JourneyTheme
 //Code for "Login" Page
 @Composable
 fun LoginScreen(){
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-        //.fillMaxSize()
-        .windowInsetsPadding(WindowInsets.statusBars),
-        verticalArrangement = Arrangement.Center,
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFD0AE90),
+                        Color(0xFF896A4E)
+                    ),
+                    startY = 0.0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            ),
+        color = Color.Transparent
     ) {
-        ComingSoon()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                //.fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            ComingSoon()
+        }
     }
 }
 

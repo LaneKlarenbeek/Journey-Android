@@ -37,6 +37,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.journey.ui.screens.CreateAccount
+import com.example.journey.ui.screens.Login
 import com.example.journey.ui.screens.LoginScreen
 import com.example.journey.ui.screens.TransitionPage
 
@@ -51,154 +52,29 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 //Primary Surface styled for background.
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                listOf(
-                                    Color(0xFFD0AE90),
-                                    Color(0xFF896A4E)
-                                ),
-                                startY = 0.0f,
-                                endY = Float.POSITIVE_INFINITY
-                            )
-                        ),
-                    color = Color.Transparent
-                ) {
-
-                    NavHost(navController = navController, startDestination = "Login"){
-                        composable("Login"){
-                            Login(
-                                onLoginClick = { navController.navigate("LoginScreen") },
-                                onCreateAccountClick = { navController.navigate("CreateAccount") },
-                                onGuestClick = { navController.navigate("HomePage") }
-                            )
-                        }
-
-                        composable("LoginScreen"){
-                            LoginScreen()
-                        }
-
-                        composable("CreateAccount"){
-                            CreateAccount()
-                        }
-
-                        composable("HomePage"){
-                            TransitionPage()
-                        }
-
+                NavHost(navController = navController, startDestination = "Login"){
+                    composable("Login"){
+                        Login(
+                            onLoginClick = { navController.navigate("LoginScreen") },
+                            onCreateAccountClick = { navController.navigate("CreateAccount") },
+                            onGuestClick = { navController.navigate("HomePage") }
+                        )
                     }
+
+                    composable("LoginScreen"){
+                        LoginScreen()
+                    }
+
+                    composable("CreateAccount"){
+                        CreateAccount()
+                    }
+
+                    composable("HomePage"){
+                        TransitionPage()
+                    }
+
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun Login(
-    modifier: Modifier = Modifier,
-    onLoginClick: () -> Unit = {},
-    onCreateAccountClick: () -> Unit = {},
-    onGuestClick: () -> Unit = {}
-) {
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-        //.fillMaxSize()
-        .windowInsetsPadding(WindowInsets.statusBars),
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Spacer(modifier = Modifier.height(23.dp))
-        Box(
-            modifier = Modifier
-                .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
-                .padding(14.dp),
-        ) {
-            Text(
-                text = "Welcome to Jou(R)ney!",
-                modifier = Modifier
-                    .width(200.dp)
-                    .fillMaxWidth(),
-                fontSize = 34.sp,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 36.sp,
-            )
-        }
-
-        //Logic for Login button
-        Spacer(modifier = Modifier.height(12.dp))
-        ElevatedButton(
-            onClick = onLoginClick,
-            //border = BorderStroke(2.dp, Color(0xFF927155)),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier,
-            colors = ButtonDefaults.elevatedButtonColors(containerColor = Color(0xFF927155), contentColor = Color.White)
-        ) {
-            Text(
-                text = "Login",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-            )
-        }
-
-        //Logic for Create Account button
-        Spacer(modifier = Modifier.height(12.dp))
-        ElevatedButton(
-            onClick = onCreateAccountClick,
-            //border = BorderStroke(2.dp, Color(0xFF927155)),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier,
-            colors = ButtonDefaults.elevatedButtonColors(containerColor = Color(0xFF927155), contentColor = Color.White)
-        ) {
-            Text(
-                text = "Create Account",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-            )
-        }
-
-        //Continue as Guest button
-        Spacer(modifier = Modifier.height(12.dp))
-        ElevatedButton(
-            onClick = onGuestClick,
-            //border = BorderStroke(2.dp, Color(0xFF927155)),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier,
-            colors = ButtonDefaults.elevatedButtonColors(containerColor = Color(0xFF927155), contentColor = Color.White)
-        ) {
-            Text(
-                text = "Continue as Guest",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginPreview(){
-    JourneyTheme(darkTheme = false, dynamicColor = false) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            Color(0xFFD0AE90),
-                            Color(0xFF896A4E)
-                        ),
-                        startY = 0.0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                ),
-            color = Color.Transparent
-        ) {
-            Login()
         }
     }
 }

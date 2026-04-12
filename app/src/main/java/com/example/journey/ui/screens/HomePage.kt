@@ -38,89 +38,104 @@ import androidx.compose.runtime.remember
 
 @Composable
 fun TransitionPage(){
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Surface(
         modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFD0AE90),
+                        Color(0xFF896A4E)
+                    ),
+                    startY = 0.0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            ),
+        color = Color.Transparent
     ) {
-        Box(
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
-                .padding(14.dp),
         ) {
-            Text(
-                text = "Welcome User!",
+            Box(
                 modifier = Modifier
-                    .width(200.dp)
-                    .fillMaxWidth(),
-                fontSize = 34.sp,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 36.sp,
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                    .padding(14.dp),
+            ) {
+                Text(
+                    text = "Welcome User!",
+                    modifier = Modifier
+                        .width(200.dp)
+                        .fillMaxWidth(),
+                    fontSize = 34.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                    .padding(14.dp),
+            ) {
+                Text(
+                    text = "To Get Started... Please enter the following information.",
+                    modifier = Modifier
+                        .width(200.dp)
+                        .fillMaxWidth(),
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
+                )
+            }
+
+            var firstName by remember { mutableStateOf("") }
+            var lastName by remember { mutableStateOf("") }
+
+            //First Name Text Field
+            TextField(
+                value = firstName,
+                onValueChange = { newText -> firstName = newText },
+                label = { Text("First Name") },
+                shape = RoundedCornerShape(12),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF927155),
+                    unfocusedContainerColor = Color(0xFF927155),
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier
+                    .padding(12.dp),
+            )
+
+            //Last Name Text Field
+            TextField(
+                value = lastName,
+                onValueChange = { newText -> lastName = newText },
+                label = { Text("Last Name") },
+                shape = RoundedCornerShape(12),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF927155),
+                    unfocusedContainerColor = Color(0xFF927155),
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier
+                    .padding(12.dp),
             )
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        Box(
-            modifier = Modifier
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
-                .padding(14.dp),
-        ) {
-            Text(
-                text = "To Get Started... Please enter the following information.",
-                modifier = Modifier
-                    .width(200.dp)
-                    .fillMaxWidth(),
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 36.sp,
-            )
-        }
-
-        var firstName by remember { mutableStateOf("") }
-        var lastName by remember { mutableStateOf("") }
-
-        //First Name Text Field
-        TextField(
-            value = firstName,
-            onValueChange = {newText -> firstName = newText},
-            label = { Text("First Name") },
-            shape = RoundedCornerShape(12),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF927155),
-                unfocusedContainerColor = Color(0xFF927155),
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                focusedLabelColor = Color.Black,
-                unfocusedLabelColor = Color.Black,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            modifier = Modifier
-                .padding(12.dp),
-        )
-
-        //Last Name Text Field
-        TextField(
-            value = lastName,
-            onValueChange = {newText -> lastName = newText},
-            label = { Text("Last Name") },
-            shape = RoundedCornerShape(12),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF927155),
-                unfocusedContainerColor = Color(0xFF927155),
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                focusedLabelColor = Color.Black,
-                unfocusedLabelColor = Color.Black,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            modifier = Modifier
-                .padding(12.dp),
-        )
-
     }
 }
 
@@ -151,12 +166,30 @@ fun TransitionPagePreview(){
 
 @Composable
 fun HomePage(){
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-        //.fillMaxSize()
-        .windowInsetsPadding(WindowInsets.statusBars),
-        verticalArrangement = Arrangement.Center,
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFD0AE90),
+                        Color(0xFF896A4E)
+                    ),
+                    startY = 0.0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            ),
+        color = Color.Transparent
     ) {
-        ComingSoon()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                //.fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            ComingSoon()
+        }
     }
 }
 
