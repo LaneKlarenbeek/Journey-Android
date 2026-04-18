@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,10 +36,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 
-
-
 @Composable
-fun TransitionPage(){
+fun TransitionPage(
+    modifier: Modifier = Modifier,
+    onContinueClick: () -> Unit = {}
+){
+    var firstName by remember {mutableStateOf("")}
+    var lastName by remember {mutableStateOf("")}
+
+    var showError by remember {mutableStateOf(false)}
+
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -77,7 +86,6 @@ fun TransitionPage(){
             Spacer(modifier = Modifier.height(12.dp))
             Box(
                 modifier = Modifier
-                    .windowInsetsPadding(WindowInsets.statusBars)
                     .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
                     .padding(14.dp),
             ) {
@@ -93,15 +101,14 @@ fun TransitionPage(){
                 )
             }
 
-            var firstName by remember { mutableStateOf("") }
-            var lastName by remember { mutableStateOf("") }
 
             //First Name Text Field
             TextField(
                 value = firstName,
-                onValueChange = { newText -> firstName = newText },
+                onValueChange = { firstName = it; showError = false },
                 label = { Text("First Name") },
                 shape = RoundedCornerShape(12),
+                maxLines = 1,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFF927155),
                     unfocusedContainerColor = Color(0xFF927155),
@@ -119,9 +126,10 @@ fun TransitionPage(){
             //Last Name Text Field
             TextField(
                 value = lastName,
-                onValueChange = { newText -> lastName = newText },
+                onValueChange = { lastName = it; showError = false },
                 label = { Text("Last Name") },
                 shape = RoundedCornerShape(12),
+                maxLines = 1,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFF927155),
                     unfocusedContainerColor = Color(0xFF927155),
@@ -135,6 +143,38 @@ fun TransitionPage(){
                 modifier = Modifier
                     .padding(12.dp),
             )
+
+            if(showError){
+                Text(
+                    text = "Please enter your first and last name.",
+                    color = Color.Red,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+
+            ElevatedButton(
+                onClick = {
+                    if(firstName.isBlank() || lastName.isBlank()){
+                        showError = true
+                    } else {
+
+                    }
+                },
+                //border = BorderStroke(2.dp, Color(0xFF927155)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier,
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = Color(0xFF927155),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = "Continue",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                )
+            }
         }
     }
 }
