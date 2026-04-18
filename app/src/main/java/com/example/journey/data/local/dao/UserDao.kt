@@ -9,8 +9,11 @@ import com.example.journey.data.local.entity.User
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertuser(user: User)
+    suspend fun insertUser(user: User)
 
     @Query("SELECT * FROM user_profile LIMIT 1")
-    suspend fun getuser(): User?
+    suspend fun getUser(): User?
+
+    @Query("Delete FROM user_profile")
+    suspend fun clearUserTable()
 }

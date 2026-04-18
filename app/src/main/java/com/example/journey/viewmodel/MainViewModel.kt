@@ -1,5 +1,6 @@
 package com.example.journey.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.journey.data.local.dao.UserDao
@@ -26,7 +27,7 @@ class MainViewModel(private val userDao: UserDao): ViewModel() {
 
     private fun checkUserExists(){
         viewModelScope.launch{
-            val existingUser = userDao.getuser()
+            val existingUser = userDao.getUser()
 
             if (existingUser == null){
                 _appState.value = AppState.NeedsInformation
@@ -37,15 +38,26 @@ class MainViewModel(private val userDao: UserDao): ViewModel() {
     }
 
     fun saveGuestUser(firstName: String, lastName: String){
+
+        Log.d("DatabaseTest", "ViewModel recieved: $firstName $lastName")
         viewModelScope.launch {
-            val newuser = User(
-                firstName = firstName,
-                lastName = lastName,
-                role = "",
-                joinDateTimeStamp = System.currentTimeMillis()
-            )
-            userDao.insertuser(newuser)
-            _appState.value = AppState.Ready
+            try {
+                val newuser = User(
+                    firstName = firstName,
+                    lastName = lastName,
+                    role = "",
+                    joinDateTimeStamp = System.currentTimeMillis()
+                )
+                userDao.insertUser(newuser)
+
+                Log.d("DatabaseTest", "ViewModel saved: $firstName $lastName")
+
+                _appState.value = AppState.Ready
+
+            } catch(e: Exception){
+                Log.e("DatabaseTest", "ViewModel failed to save: $firstName $lastName")
+
+            }
         }
     }
 }

@@ -2,6 +2,10 @@ package com.example.journey.data.local.entity
 
 import androidx.room.*
 
+import androidx.room.Embedded
+import androidx.room.Relation
+/*
+
 data class JourneyWithStops(
     @Embedded val journey: Journey,
 
@@ -11,3 +15,4 @@ data class JourneyWithStops(
     )
     val stops: List<Stop>
 )
+*/

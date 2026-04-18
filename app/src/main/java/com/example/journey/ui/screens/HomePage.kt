@@ -39,13 +39,12 @@ import androidx.compose.runtime.remember
 @Composable
 fun TransitionPage(
     modifier: Modifier = Modifier,
-    onContinueClick: () -> Unit = {}
+    onContinueClick: (firstName:String, laseName:String) -> Unit
 ){
     var firstName by remember {mutableStateOf("")}
     var lastName by remember {mutableStateOf("")}
 
     var showError by remember {mutableStateOf(false)}
-
 
     Surface(
         modifier = Modifier
@@ -150,6 +149,12 @@ fun TransitionPage(
                     color = Color.Red,
                     modifier = Modifier.padding(start = 16.dp)
                 )
+            } else {
+                Text(
+                    text = firstName + " " + lastName,
+                    color = Color.Black,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
             }
 
             ElevatedButton(
@@ -157,7 +162,7 @@ fun TransitionPage(
                     if(firstName.isBlank() || lastName.isBlank()){
                         showError = true
                     } else {
-
+                        onContinueClick(firstName.trim(), lastName.trim())
                     }
                 },
                 //border = BorderStroke(2.dp, Color(0xFF927155)),
@@ -198,7 +203,7 @@ fun TransitionPagePreview(){
                 ),
             color = Color.Transparent
         ) {
-            TransitionPage()
+            TransitionPage(Modifier, {_, _ -> })
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.journey.data.repository
 
+/*
 
 import com.example.journey.data.local.entity.Journey
 import com.example.journey.data.local.entity.Stop
@@ -18,3 +19,4 @@ class JourneyRepository(
         return journeyDao.getJourneysWithStops()
     }
 }
+*/

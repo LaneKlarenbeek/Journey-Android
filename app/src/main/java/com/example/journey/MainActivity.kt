@@ -1,38 +1,12 @@
 package com.example.journey
 
 import android.os.Bundle
+import android.transition.Transition
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.viewModels
 import com.example.journey.ui.theme.JourneyTheme
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Surface
-import androidx.compose.ui.graphics.Brush
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -40,39 +14,95 @@ import com.example.journey.ui.screens.CreateAccount
 import com.example.journey.ui.screens.Login
 import com.example.journey.ui.screens.LoginScreen
 import com.example.journey.ui.screens.TransitionPage
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import com.example.journey.viewmodel.MainViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.journey.ui.screens.HomePage
+import com.example.journey.viewmodel.AppState
+
+//import com.example.journey.data.local.entity.Journey
+//import com.example.journey.data.repository.JourneyRepository
+//import com.example.journey.viewmodel.JourneyViewModel
 
 class MainActivity : ComponentActivity() {
+    private val mainViewModel: MainViewModel by viewModels{
+        object: ViewModelProvider.Factory{
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                val database = androidx.room.Room.databaseBuilder(
+                    applicationContext,
+                    com.example.journey.data.local.AppDatabase::class.java,
+                    "journey_database"
+                ).build()
+
+                if(modelClass.isAssignableFrom(MainViewModel::class.java)){
+                    @Suppress("UNCHECKED_CAST")
+                    return MainViewModel(database.UserDao()) as T
+                }
+
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(database.UserDao()) as T
+            }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             JourneyTheme(darkTheme = false) {
 
-                //Main controller for initial navigation through Startup menu's
-                val navController = rememberNavController()
+                // 1. This is the magic line. It continuously watches the ViewModel for changes.
+                val appState by mainViewModel.appState.collectAsState()
 
-                //Primary Surface styled for background.
-                NavHost(navController = navController, startDestination = "Login"){
-                    composable("Login"){
-                        Login(
-                            onLoginClick = { navController.navigate("LoginScreen") },
-                            onCreateAccountClick = { navController.navigate("CreateAccount") },
-                            onGuestClick = { navController.navigate("HomePage") }
-                        )
+                // 2. The Traffic Director
+                when (appState) {
+
+                    is AppState.Loading -> {
+                        // Keep blank while checking the database on startup
                     }
 
-                    composable("LoginScreen"){
-                        LoginScreen()
+                    is AppState.NeedsInformation -> {
+                        // The user is not in the database. Show the Onboarding Flow.
+                        val navController = rememberNavController()
+
+                        NavHost(navController = navController, startDestination = "Login") {
+                            composable("Login"){
+                                Login(
+                                    onLoginClick = { navController.navigate("LoginScreen") },
+                                    onCreateAccountClick = { navController.navigate("CreateAccount") },
+                                    onGuestClick = { navController.navigate("TransitionScreen") }
+                                )
+                            }
+
+                            composable("LoginScreen"){
+                                LoginScreen()
+                            }
+
+                            composable("CreateAccount"){
+                                CreateAccount()
+                            }
+
+                            // Renamed from "HomePage" to "TransitionScreen" to avoid confusion
+                            composable("TransitionScreen"){
+                                TransitionPage(
+                                    onContinueClick = { enteredFirstName, enteredLastName ->
+                                        // 3. This calls the ViewModel.
+                                        // The ViewModel saves the DB, then flips the appState to "Ready".
+                                        mainViewModel.saveGuestUser(enteredFirstName, enteredLastName)
+                                    }
+                                )
+                            }
+                        }
                     }
 
-                    composable("CreateAccount"){
-                        CreateAccount()
+                    is AppState.Ready -> {
+                        // 4. The moment the ViewModel says "Ready", the NavHost above is instantly
+                        // erased from the screen, and this true HomePage composable is drawn.
+                        HomePage()
                     }
-
-                    composable("HomePage"){
-                        TransitionPage()
-                    }
-
                 }
             }
         }

@@ -1,4 +1,5 @@
 package com.example.journey.viewmodel
+/*
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,3 +41,4 @@ class JourneyViewModel(private val journeyRepository: JourneyRepository) : ViewM
         }
     }
 }
+*/

@@ -1,13 +1,13 @@
 package com.example.journey.data.local.entity
 
 import androidx.room.*
-
+/*
 @Entity(
     tableName = "stops",
     foreignKeys = [
         ForeignKey(
             entity = Journey::class,
-            parentColumns = ["id"],
+            parentColumns = ["JourneyId"],
             childColumns = ["journeyOwnerId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -22,3 +22,4 @@ data class Stop(
     val locationName: String,
     val sequenceOrder: Int,
 )
+*/
