@@ -1,0 +1,204 @@
+package com.example.journey.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.journey.ui.theme.JourneyTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+
+@Composable
+fun TransitionPage(
+    modifier: Modifier = Modifier,
+    onContinueClick: (firstName:String, laseName:String) -> Unit
+){
+    var firstName by remember {mutableStateOf("")}
+    var lastName by remember {mutableStateOf("")}
+
+    var showError by remember {mutableStateOf(false)}
+
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFD0AE90),
+                        Color(0xFF896A4E)
+                    ),
+                    startY = 0.0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            ),
+        color = Color.Transparent
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+        ) {
+            Box(
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                    .padding(14.dp),
+            ) {
+                Text(
+                    text = "Welcome User!",
+                    modifier = Modifier
+                        .width(200.dp)
+                        .fillMaxWidth(),
+                    fontSize = 34.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(
+                modifier = Modifier
+                    .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                    .padding(14.dp),
+            ) {
+                Text(
+                    text = "Lets Get Started!",
+                    modifier = Modifier
+                        .width(200.dp)
+                        .fillMaxWidth(),
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
+                )
+            }
+
+
+            //First Name Text Field
+            TextField(
+                value = firstName,
+                onValueChange = { firstName = it; showError = false },
+                label = { Text("First Name") },
+                shape = RoundedCornerShape(12),
+                maxLines = 1,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF927155),
+                    unfocusedContainerColor = Color(0xFF927155),
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier
+                    .padding(12.dp),
+            )
+
+            //Last Name Text Field
+            TextField(
+                value = lastName,
+                onValueChange = { lastName = it; showError = false },
+                label = { Text("Last Name") },
+                shape = RoundedCornerShape(12),
+                maxLines = 1,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF927155),
+                    unfocusedContainerColor = Color(0xFF927155),
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier
+                    .padding(12.dp),
+            )
+
+            if(showError){
+                Text(
+                    text = "Please enter your first and last name.",
+                    color = Color.Red,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+
+            ElevatedButton(
+                onClick = {
+                    if(firstName.isBlank() || lastName.isBlank()){
+                        showError = true
+                    } else {
+                        onContinueClick(firstName.trim(), lastName.trim())
+                    }
+                },
+                //border = BorderStroke(2.dp, Color(0xFF927155)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier,
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = Color(0xFF927155),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = "Continue",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TransitionPagePreview(){
+    JourneyTheme(darkTheme = false, dynamicColor = false) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            Color(0xFFD0AE90),
+                            Color(0xFF896A4E),
+                        ),
+                        startY = 0.0f,
+                        endY = Float.POSITIVE_INFINITY
+                    )
+                ),
+            color = Color.Transparent
+        ) {
+            TransitionPage(Modifier, {_, _ -> })
+        }
+    }
+}
+
