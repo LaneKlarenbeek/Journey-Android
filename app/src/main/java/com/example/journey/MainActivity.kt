@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.journey.viewmodel.MainViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.ui.screens.HomePage
 import com.example.journey.viewmodel.AppState
 
@@ -39,11 +40,11 @@ class MainActivity : ComponentActivity() {
 
                 if(modelClass.isAssignableFrom(MainViewModel::class.java)){
                     @Suppress("UNCHECKED_CAST")
-                    return MainViewModel(database.UserDao()) as T
+                    return MainViewModel(database.userDao(),database.journeyTemplateDao()) as T
                 }
 
                 @Suppress("UNCHECKED_CAST")
-                return MainViewModel(database.UserDao()) as T
+                return MainViewModel(database.userDao(),database.journeyTemplateDao()) as T
             }
         }
     }
@@ -100,12 +101,13 @@ class MainActivity : ComponentActivity() {
 
                     is AppState.Ready -> {
 
-                        val user by mainViewModel.currentUser.collectAsState()
-                        val firstName = user?.firstName ?: "RA"
+                        val user = mainViewModel.currentUser.collectAsState()
 
                         HomePage(
-                            userName = firstName,
-                            onCreateTemplateClick = { /*TODO*/ }
+                            userName = user.value!!.firstName,
+                            onCreateTemplate = { enteredTemplateName, enteredStopNames ->
+                                mainViewModel.saveTemplate(enteredTemplateName, enteredStopNames)
+                            }
                         )
                     }
                 }

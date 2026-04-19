@@ -2,21 +2,22 @@ package com.example.journey.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-//import com.example.journey.data.local.entity.Journey
-//import com.example.journey.data.local.entity.Stop
-//import com.example.journey.data.local.dao.JourneyDao
+import com.example.journey.data.local.dao.JourneyTemplateDao
 import com.example.journey.data.local.dao.UserDao
+import com.example.journey.data.local.entity.JourneyTemplate
+import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.data.local.entity.User
+
 @Database(
     entities = [
         User::class,
-        //Journey::class,
-       //Stop::class
+        JourneyTemplate::class,
+        StopTemplate::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
-    //abstract fun journeyDao(): JourneyDao
-    abstract fun UserDao(): UserDao
+    abstract fun userDao(): UserDao
+    abstract fun journeyTemplateDao(): JourneyTemplateDao
 }

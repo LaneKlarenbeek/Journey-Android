@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("templateId")]
+    indices = [Index("templateOwnerId")]
 )
 data class StopTemplate(
     @PrimaryKey(autoGenerate = true) val stopTemplateId: Long = 0,
