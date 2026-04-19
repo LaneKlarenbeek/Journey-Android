@@ -21,6 +21,9 @@ class MainViewModel(private val userDao: UserDao): ViewModel() {
     private val _appState = MutableStateFlow<AppState>(AppState.Loading)
     val appState: StateFlow<AppState> = _appState.asStateFlow()
 
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+
     init{
         checkUserExists()
     }
@@ -32,6 +35,7 @@ class MainViewModel(private val userDao: UserDao): ViewModel() {
             if (existingUser == null){
                 _appState.value = AppState.NeedsInformation
             } else {
+                _currentUser.value = existingUser
                 _appState.value = AppState.Ready
             }
         }
@@ -42,16 +46,17 @@ class MainViewModel(private val userDao: UserDao): ViewModel() {
         Log.d("DatabaseTest", "ViewModel recieved: $firstName $lastName")
         viewModelScope.launch {
             try {
-                val newuser = User(
+                val newUser = User(
                     firstName = firstName,
                     lastName = lastName,
                     role = "",
                     joinDateTimeStamp = System.currentTimeMillis()
                 )
-                userDao.insertUser(newuser)
+                userDao.insertUser(newUser)
 
                 Log.d("DatabaseTest", "ViewModel saved: $firstName $lastName")
 
+                _currentUser.value = newUser
                 _appState.value = AppState.Ready
 
             } catch(e: Exception){

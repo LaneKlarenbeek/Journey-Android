@@ -25,7 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Brush
@@ -42,6 +41,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -49,9 +51,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomePage(){
+fun HomePage(
+    userName: String,
+    onCreateTemplateClick: () -> Unit = {}
+){
+
+    var isMenuExpanded by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -67,27 +79,95 @@ fun HomePage(){
             ),
         color = Color.Transparent
     ) {
+
         Scaffold(
-            // This is CRITICAL: It makes the Scaffold invisible so your gradient shows through
             containerColor = Color.Transparent,
 
-            // 2. Define the Floating Action Button
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { /*TODO*/ },
-                    // Set the background color of the button (optional, can be transparent if your image fills it)
-                    containerColor = Color(0xFF927155),
-                    contentColor = Color.White,
-                    shape = RoundedCornerShape(12.dp),
+                // 2. A Column holds the expanding menu AND the main button
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.add_template_no_background_black),
-                        contentDescription = "Create New Template",
-                        modifier = Modifier.size(32.dp) // Adjust size as needed
-                    )
+
+                    // 3. The Animated Menu (Only visible when isMenuExpanded is true)
+                    AnimatedVisibility(
+                        visible = isMenuExpanded,
+                        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+                        exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        ) {
+
+                            // Sub-Button: Create Template
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                // Optional Text Label next to the button
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color(0xFF927155),
+                                    modifier = Modifier.padding(end = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "New Template",
+                                        color = Color.White,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+
+                                SmallFloatingActionButton(
+                                    onClick = {
+                                        isMenuExpanded = false // Close menu
+                                        onCreateTemplateClick() // Route to new screen
+                                    },
+                                    containerColor = Color(0xFF927155),
+                                    contentColor = Color.White
+                                ) {
+                                    // You can use a Text or an Icon here
+                                    Text("+")
+                                }
+                            }
+
+                            // You can copy/paste that Row above to add more sub-buttons here!
+                        }
+                    }
+
+                    // 4. The Main Trigger Button at the bottom
+                    FloatingActionButton(
+                        onClick = {
+                            // Toggles the state between true and false
+                            isMenuExpanded = !isMenuExpanded
+                        },
+                        containerColor = Color(0xFF927155),
+                        contentColor = Color.White,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        // Bonus UX: Change the text/icon based on whether it is open!
+                        if (isMenuExpanded) {
+                            Text(
+                                text = "X",
+                                fontSize = 24.sp,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(id = R.drawable.add_template_no_background_white),
+                                contentDescription = "Menu",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
                 }
             }
         ) { innerPadding ->
+
+
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -95,13 +175,38 @@ fun HomePage(){
                     .fillMaxSize()
                     .padding(innerPadding) // This padding prevents content from hiding behind the button
                     .windowInsetsPadding(WindowInsets.statusBars),
-                verticalArrangement = Arrangement.Center,
             ) {
-                ComingSoon()
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "No Templates Yet",
-                    color = Color.White
+                    text = "Hello",
+                    modifier = Modifier
+                        .width(200.dp)
+                        .fillMaxWidth(),
+                    fontSize = 34.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
                 )
+
+                Text(
+                    text = userName,
+                    modifier = Modifier
+                        .width(200.dp)
+                        .fillMaxWidth(),
+                    fontSize = 34.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
+                )
+
+                Text(
+                    text = "Ready to start a Journey?",
+                    color = Color.Black,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+
             }
         }
     }
@@ -126,7 +231,10 @@ fun HomePagePreview(){
                 ),
             color = Color.Transparent,
         ) {
-            HomePage()
+            HomePage(
+                userName = "User",
+                onCreateTemplateClick = {}
+            )
         }
     }
 }

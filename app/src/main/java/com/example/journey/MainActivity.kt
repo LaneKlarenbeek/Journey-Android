@@ -99,9 +99,14 @@ class MainActivity : ComponentActivity() {
                     }
 
                     is AppState.Ready -> {
-                        // 4. The moment the ViewModel says "Ready", the NavHost above is instantly
-                        // erased from the screen, and this true HomePage composable is drawn.
-                        HomePage()
+
+                        val user by mainViewModel.currentUser.collectAsState()
+                        val firstName = user?.firstName ?: "RA"
+
+                        HomePage(
+                            userName = firstName,
+                            onCreateTemplateClick = { /*TODO*/ }
+                        )
                     }
                 }
             }
