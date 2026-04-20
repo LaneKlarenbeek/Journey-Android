@@ -74,7 +74,7 @@ fun HomePage(
     onCreateTemplateClick: () -> Unit,
     onSaveTemplate: (String, List<String>) -> Unit = { _, _ -> },
     onDeleteTemplate: (JourneyTemplate) -> Unit = {},
-    onEditTemplate: (templateId: Long, newName: String, newStops: List<String>) -> Unit
+    onEditTemplate: (templateId: Long, newName: String, newStops: List<String>) -> Unit,
 ){
     var isMenuExpanded by remember { mutableStateOf(false) }
     var showCreateTemplateDialog by remember { mutableStateOf(false) }
@@ -101,7 +101,6 @@ fun HomePage(
             ),
         color = Color.Transparent
     ) {
-
         Scaffold(
             containerColor = Color.Transparent,
 
@@ -111,11 +110,15 @@ fun HomePage(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
 
+                    /*************************
+                     * AnimatedList for displaying the action menu
+                     **************************/
                     AnimatedVisibility(
                         visible = isMenuExpanded,
                         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
                         exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
-                    ) {
+                    )
+                    {
                         Column(
                             horizontalAlignment = Alignment.End,
                             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -150,10 +153,13 @@ fun HomePage(
                                 }
                             }
 
-                            // More Buttons can be added to the column here.
+                            // Additional Buttons can be added to the column here.
                         }
                     }
 
+                    /*************************
+                     * Floating Action Button for viewing the action meny
+                     **************************/
                     FloatingActionButton(
                         onClick = {
                             isMenuExpanded = !isMenuExpanded
@@ -161,7 +167,8 @@ fun HomePage(
                         containerColor = Color(0xFF927155),
                         contentColor = Color.White,
                         shape = RoundedCornerShape(12.dp)
-                    ) {
+                    )
+                    {
                         if (isMenuExpanded) {
                             Text(
                                 text = "X",
@@ -179,7 +186,8 @@ fun HomePage(
                     }
                 }
             }
-        ) { innerPadding ->
+        )
+        { innerPadding ->
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -209,7 +217,6 @@ fun HomePage(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                //Primary Display Surface for Templates on HomePage
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -233,12 +240,10 @@ fun HomePage(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // 2. The scrollable list of templates
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp)
-                            // weight(1f) tells it to take up the remaining space on the screen
                             .weight(1f),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
@@ -246,20 +251,26 @@ fun HomePage(
                             TemplateListItem(
                                 templateData = templateData,
                                 onEdit = { templateToEdit = templateData },
-                                onDelete = { onDeleteTemplate(templateData.template) }
+                                onDelete = { onDeleteTemplate(templateData.template) },
+                                onStartJourney = {  }
                             )
                         }
                     }
-
                 }
             }
 
-            //*********************************************
-            //Below this point is supporting code
-            //for the Home Page Dialog Boxes
-            //*********************************************
-            //Dialog page for creating a new Journey Template(name only)
-            if(showCreateTemplateDialog) {
+            /*********************************************
+            Below this point is supporting code
+            for the Home Page Dialog Boxes
+            *********************************************/
+
+
+            /*************************
+             * Dialog page for Creating a new template
+             * Specifically for the Template Name
+             **************************/
+            if(showCreateTemplateDialog)
+            {
                 Dialog(
                     onDismissRequest = { showCreateTemplateDialog = false },
                 )
@@ -330,12 +341,14 @@ fun HomePage(
                 }
             }
 
-            //Dialog Page for adding stops to a Journey Template
-            if(showStopAddDialog){
+            /*************************
+            * Dialog page for adding stops to a journey template
+            **************************/
+            if(showStopAddDialog)
+            {
                 Dialog(
                     onDismissRequest = { showStopAddDialog = false },
-                )
-                {
+                ){
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         color = Color.White,
@@ -450,8 +463,14 @@ fun HomePage(
                     }
                 }
             }
-            // Dialog Page for Editing an Existing Template
-            if (templateToEdit != null) {
+
+            /*************************
+             * Dialog page for editing an existing template
+             * Updates the name, deletes the existing stops
+             * and replaces the list
+             **************************/
+            if (templateToEdit != null)
+            {
                 val currentTemplate = templateToEdit!!
 
                 // Pre-fill the state with the existing data
@@ -588,37 +607,18 @@ fun HomePage(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun HomePagePreview(){
-    JourneyTheme(darkTheme = false, dynamicColor = false) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            Color(0xFFD0AE90),
-                            Color(0xFF896A4E)
-                        ),
-                        startY = 0.0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                ),
-            color = Color.Transparent,
-        ) {
-
-        }
-    }
-}
-
-//Defines the card/item for which each template is displayed in the list.
+/*************************
+ * Composable to display a Template in list
+ * on the page when creating a new Journey Template
+ **************************/
 @Composable
 fun TemplateListItem(
     templateData: JourneyTemplateWithStops,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
+    onDelete: () -> Unit,
+    onStartJourney: () -> Unit
+)
+{
     var showMenu by remember { mutableStateOf(false) }
 
     Card(
@@ -645,6 +645,16 @@ fun TemplateListItem(
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
+            }
+
+            Box{
+                IconButton(onClick = { onStartJourney() }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.play_icon_green),
+                        contentDescription = "Template Options",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
             Box {

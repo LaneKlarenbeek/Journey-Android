@@ -46,6 +46,9 @@ fun TransitionPage(
 
     var showError by remember {mutableStateOf(false)}
 
+    /***********************
+     * Primary Surface styled for the transition page
+     ************************/
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +63,8 @@ fun TransitionPage(
                 )
             ),
         color = Color.Transparent
-    ) {
+    )
+    {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
