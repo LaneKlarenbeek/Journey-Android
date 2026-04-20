@@ -44,10 +44,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
@@ -61,16 +67,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.journey.data.local.entity.JourneyTemplate
+import com.example.journey.data.local.entity.JourneyTemplateWithStops
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(
     userName: String,
-    onCreateTemplate: (templateName: String, stopNames: List<String>) -> Unit
+    templates: List<JourneyTemplateWithStops>, // Add this
+    onCreateTemplateClick: () -> Unit,
+    onSaveTemplate: (String, List<String>) -> Unit = { _, _ -> },
+    onDeleteTemplate: (JourneyTemplate) -> Unit = {}, // Add this
+    onEditTemplate: (JourneyTemplateWithStops) -> Unit = {} // Add this
 ){
 
     var isMenuExpanded by remember { mutableStateOf(false) }
@@ -185,18 +199,7 @@ fun HomePage(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Hello",
-                    modifier = Modifier
-                        .width(200.dp)
-                        .fillMaxWidth(),
-                    fontSize = 34.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 36.sp,
-                )
-
-                Text(
-                    text = userName,
+                    text = "Hello " + userName + "!",
                     modifier = Modifier
                         .width(200.dp)
                         .fillMaxWidth(),
@@ -213,9 +216,57 @@ fun HomePage(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 4.dp)
                 )
+                Spacer(modifier = Modifier.height(16.dp))
 
+                //Primary Display Surface for Templates on HomePage
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .windowInsetsPadding(WindowInsets.statusBars),
+                ) {
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Text(
+                        text = "Templates",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        textAlign = TextAlign.Left
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // 2. The scrollable list of templates
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            // weight(1f) tells it to take up the remaining space on the screen
+                            .weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(templates) { templateData ->
+                            TemplateListItem(
+                                templateData = templateData,
+                                onEdit = { onEditTemplate(templateData) },
+                                onDelete = { onDeleteTemplate(templateData.template) }
+                            )
+                        }
+                    }
+
+                }
             }
 
+            //*********************************************
+            //Below this point is supporting code
+            //for the Home Page Dialog Boxes
+            //*********************************************
             //Dialog page for creating a new Journey Template(name only)
             if(showCreateTemplateDialog) {
                 Dialog(
@@ -271,7 +322,6 @@ fun HomePage(
 
                                 Button(
                                     onClick = {
-                                        // TODO: Save the template name to ViewModel here
                                         showStopAddDialog = true
                                         showCreateTemplateDialog = false
                                     },
@@ -387,9 +437,10 @@ fun HomePage(
 
                                 Button(
                                     onClick = {
-                                        onCreateTemplate(templateName, stopsList)
+                                        onSaveTemplate(templateName, stopsList.toList())
+                                        stopsList.clear()
+                                        templateName = ""
                                         showStopAddDialog = false
-
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color(
@@ -400,12 +451,10 @@ fun HomePage(
                                     Text("Create Template")
                                 }
                             }
-
                         }
                     }
                 }
             }
-
         }
     }
 }
@@ -429,10 +478,77 @@ fun HomePagePreview(){
                 ),
             color = Color.Transparent,
         ) {
-            HomePage(
+            /*HomePage(
                 userName = "User",
-                onCreateTemplate = {_, _ ->}
-            )
+            )*/
+        }
+    }
+}
+
+@Composable
+fun TemplateListItem(
+    templateData: JourneyTemplateWithStops,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = templateData.template.title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF896A4E)
+                )
+                Text(
+                    text = "${templateData.stops.size} Stops",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.more_menu_vertical),
+                        contentDescription = "Template Options",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Edit") },
+                        onClick = {
+                            showMenu = false
+                            onEdit()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Delete", color = Color.Red) },
+                        onClick = {
+                            showMenu = false
+                            onDelete()
+                        }
+                    )
+                }
+            }
         }
     }
 }

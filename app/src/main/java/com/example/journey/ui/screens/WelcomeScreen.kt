@@ -63,7 +63,7 @@ fun Login(
             Spacer(modifier = Modifier.height(23.dp))
             Box(
                 modifier = Modifier
-                    .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
+                        .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
                     .padding(14.dp),
             ) {
                 Text(

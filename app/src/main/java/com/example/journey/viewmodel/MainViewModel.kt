@@ -6,12 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.journey.data.local.dao.JourneyTemplateDao
 import com.example.journey.data.local.dao.UserDao
 import com.example.journey.data.local.entity.JourneyTemplate
+import com.example.journey.data.local.entity.JourneyTemplateWithStops
 import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.data.local.entity.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 
 sealed class AppState {
     object Loading : AppState()
@@ -70,6 +73,8 @@ class MainViewModel(private val userDao: UserDao, private val journeyTemplateDao
     }
 
     fun saveTemplate(templateName: String, stopNames: List<String>) {
+
+        Log.d("DatabaseTest", "Button Clicked! Name: '$templateName', Stops: ${stopNames.size}")
         viewModelScope.launch {
             try {
                 // 1. Wrap the String inside your Database Entity object!
@@ -95,6 +100,25 @@ class MainViewModel(private val userDao: UserDao, private val journeyTemplateDao
 
             } catch (e: Exception) {
                 Log.e("DatabaseTest", "Failed to save template: ${e.message}", e)
+            }
+        }
+    }
+
+    //Creating the flow interface for the database to be interacted with dynamically.
+    val templates: StateFlow<List<JourneyTemplateWithStops>> = journeyTemplateDao.getJourneyTemplatesWithStops()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun deleteTemplate(template: JourneyTemplate){
+        viewModelScope.launch{
+            try{
+                journeyTemplateDao.deleteJourneyTemplate(template)
+                Log.d("DatabaseTest", "SUCCESS! Template '${template.title}' deleted.")
+            } catch (e: Exception){
+                Log.e("DatabaseTest", "Failed to delete template: ${e.message}", e)
             }
         }
     }

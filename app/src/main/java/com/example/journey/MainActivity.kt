@@ -2,6 +2,7 @@ package com.example.journey
 
 import android.os.Bundle
 import android.transition.Transition
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -100,13 +101,25 @@ class MainActivity : ComponentActivity() {
                     }
 
                     is AppState.Ready -> {
+                        val user by mainViewModel.currentUser.collectAsState()
+                        val firstName = user?.firstName ?: "RA"
 
-                        val user = mainViewModel.currentUser.collectAsState()
+                        // Grab the live list of templates!
+                        val templates by mainViewModel.templates.collectAsState()
 
                         HomePage(
-                            userName = user.value!!.firstName,
-                            onCreateTemplate = { enteredTemplateName, enteredStopNames ->
-                                mainViewModel.saveTemplate(enteredTemplateName, enteredStopNames)
+                            userName = firstName,
+                            templates = templates,
+                            onCreateTemplateClick = {  },
+                            onSaveTemplate = { name, stops ->
+                                mainViewModel.saveTemplate(name, stops)
+                            },
+                            onDeleteTemplate = { template ->
+                                mainViewModel.deleteTemplate(template)
+                            },
+                            onEditTemplate = { templateData ->
+                                // TODO: We will build the edit functionality next!
+                                Log.d("Action", "Edit clicked for ${templateData.template.title}")
                             }
                         )
                     }
