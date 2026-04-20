@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.JourneyTemplateWithStops
 import com.example.journey.data.local.entity.StopTemplate
@@ -27,4 +28,12 @@ interface JourneyTemplateDao {
     suspend fun getAllStopsForAllJourneyTemplates(): List<StopTemplate>
     @Delete
     suspend fun deleteJourneyTemplate(journeyTemplate: JourneyTemplate)
+
+    //Update Function for editing a template
+    @Update
+    suspend fun updateJourneyTemplate(journeyTemplate: JourneyTemplate)
+
+    //Delete Function for deleting the Stops attached to a specific Template
+    @Query("DELETE FROM stop_templates WHERE templateOwnerId = :templateId")
+    suspend fun deleteStopsForTemplateById(templateId: Long)
 }

@@ -122,4 +122,29 @@ class MainViewModel(private val userDao: UserDao, private val journeyTemplateDao
             }
         }
     }
+
+    fun UpdateTemplate(templateId: Long, newName: String, newStops: List<String>){
+        viewModelScope.launch{
+            try{
+                val updatedTemplate = JourneyTemplate(templateId, newName)
+                journeyTemplateDao.updateJourneyTemplate(updatedTemplate)
+
+                journeyTemplateDao.deleteStopsForTemplateById(templateId)
+
+                val newStopTemplates = newStops.mapIndexed { index, name ->
+                    StopTemplate(
+                        templateOwnerId = templateId,
+                        locationName = name,
+                        sequenceOrder = index
+                    )
+                }
+
+                journeyTemplateDao.insertStopTemplate(newStopTemplates)
+                Log.d("DatabaseTest", "SUCCESS! Template '$newName' updated.")
+
+            } catch(e: Exception){
+                Log.e("DatabaseTest", "Failed to update template: ${e.message}", e)
+            }
+        }
+    }
 }

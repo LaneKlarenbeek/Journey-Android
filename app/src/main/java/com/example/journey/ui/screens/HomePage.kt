@@ -1,7 +1,5 @@
 package com.example.journey.ui.screens
 
-import android.widget.Button
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,22 +9,18 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -39,10 +33,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -51,7 +45,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,7 +52,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -67,8 +59,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -80,16 +70,17 @@ import com.example.journey.data.local.entity.JourneyTemplateWithStops
 @Composable
 fun HomePage(
     userName: String,
-    templates: List<JourneyTemplateWithStops>, // Add this
+    templates: List<JourneyTemplateWithStops>,
     onCreateTemplateClick: () -> Unit,
     onSaveTemplate: (String, List<String>) -> Unit = { _, _ -> },
-    onDeleteTemplate: (JourneyTemplate) -> Unit = {}, // Add this
-    onEditTemplate: (JourneyTemplateWithStops) -> Unit = {} // Add this
+    onDeleteTemplate: (JourneyTemplate) -> Unit = {},
+    onEditTemplate: (templateId: Long, newName: String, newStops: List<String>) -> Unit
 ){
-
     var isMenuExpanded by remember { mutableStateOf(false) }
     var showCreateTemplateDialog by remember { mutableStateOf(false) }
     var showStopAddDialog by remember { mutableStateOf(false) }
+    var templateToEdit by remember { mutableStateOf<JourneyTemplateWithStops?>(null) }
+
 
     //variables to be submitted to database
     var templateName by remember { mutableStateOf("") }
@@ -254,7 +245,7 @@ fun HomePage(
                         items(templates) { templateData ->
                             TemplateListItem(
                                 templateData = templateData,
-                                onEdit = { onEditTemplate(templateData) },
+                                onEdit = { templateToEdit = templateData },
                                 onDelete = { onDeleteTemplate(templateData.template) }
                             )
                         }
@@ -455,6 +446,136 @@ fun HomePage(
                     }
                 }
             }
+            // Dialog Page for Editing an Existing Template
+            if (templateToEdit != null) {
+                val currentTemplate = templateToEdit!!
+
+                // Pre-fill the state with the existing data
+                var editTemplateName by remember { mutableStateOf(currentTemplate.template.title) }
+                val editStopsList = remember {
+                    mutableStateListOf<String>().apply {
+                        // Sort by sequenceOrder to ensure they load in the exact order they were saved
+                        addAll(currentTemplate.stops.sortedBy { it.sequenceOrder }.map { it.locationName })
+                    }
+                }
+                var editStopName by remember { mutableStateOf("") }
+
+                Dialog(
+                    onDismissRequest = { templateToEdit = null },
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
+                            .heightIn(max = 600.dp) // Prevents the dialog from getting too tall
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Edit Template",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF896A4E)
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            OutlinedTextField(
+                                value = editTemplateName,
+                                onValueChange = { editTemplateName = it },
+                                label = { Text("Template Name") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(0xFF927155),
+                                    focusedLabelColor = Color(0xFF927155)
+                                )
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Scrollable list of existing stops
+                            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                                items(editStopsList.size) { index ->
+                                    ListItem(
+                                        headlineContent = { Text(editStopsList[index]) },
+                                        trailingContent = {
+                                            IconButton(
+                                                onClick = { editStopsList.removeAt(index) }
+                                            ) {
+                                                Text("❌")
+                                            }
+                                        }
+                                    )
+                                    HorizontalDivider()
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = editStopName,
+                                    onValueChange = { editStopName = it },
+                                    label = { Text("Add Stop") },
+                                    modifier = Modifier.weight(1f),
+                                    singleLine = true,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(0xFF927155),
+                                        focusedLabelColor = Color(0xFF927155)
+                                    )
+                                )
+
+                                TextButton(
+                                    onClick = {
+                                        if (editStopName.isNotBlank()) {
+                                            editStopsList.add(editStopName)
+                                            editStopName = ""
+                                        }
+                                    },
+                                    modifier = Modifier.padding(end = 8.dp)
+                                ) {
+                                    Text("Add", color = Color.Gray)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                TextButton(
+                                    onClick = { templateToEdit = null },
+                                    modifier = Modifier.padding(end = 8.dp)
+                                ) {
+                                    Text("Cancel", color = Color.Gray)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        // Pass the ID, the updated name, and the frozen list to the ViewModel
+                                        onEditTemplate(
+                                            currentTemplate.template.templateId,
+                                            editTemplateName,
+                                            editStopsList.toList()
+                                        )
+                                        templateToEdit = null // Close the dialog
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF927155))
+                                ) {
+                                    Text("Save Changes")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -478,13 +599,12 @@ fun HomePagePreview(){
                 ),
             color = Color.Transparent,
         ) {
-            /*HomePage(
-                userName = "User",
-            )*/
+
         }
     }
 }
 
+//Defines the card/item for which each template is displayed in the list.
 @Composable
 fun TemplateListItem(
     templateData: JourneyTemplateWithStops,

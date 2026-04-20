@@ -117,9 +117,8 @@ class MainActivity : ComponentActivity() {
                             onDeleteTemplate = { template ->
                                 mainViewModel.deleteTemplate(template)
                             },
-                            onEditTemplate = { templateData ->
-                                // TODO: We will build the edit functionality next!
-                                Log.d("Action", "Edit clicked for ${templateData.template.title}")
+                            onEditTemplate = { templateId, newName, newStops ->
+                                mainViewModel.UpdateTemplate(templateId, newName, newStops)
                             }
                         )
                     }
