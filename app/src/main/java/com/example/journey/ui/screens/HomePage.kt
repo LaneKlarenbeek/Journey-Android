@@ -366,7 +366,12 @@ fun HomePage(
                                             IconButton(
                                                 onClick = { stopsList.removeAt(index) }
                                             ){
-                                                Text("❌")
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.delete_icon_brown),
+                                                    contentDescription = "Delete Stop",
+                                                    modifier = Modifier.size(20.dp)
+
+                                                )
                                             }
                                         }
                                     )
@@ -424,7 +429,6 @@ fun HomePage(
                                 ) {
                                     Text("Cancel", color = Color.Gray)
                                 }
-
 
                                 Button(
                                     onClick = {
@@ -507,7 +511,11 @@ fun HomePage(
                                             IconButton(
                                                 onClick = { editStopsList.removeAt(index) }
                                             ) {
-                                                Text("❌")
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.delete_icon_brown),
+                                                    contentDescription = "Delete Stop",
+                                                    modifier = Modifier.size(20.dp)
+                                                )
                                             }
                                         }
                                     )
