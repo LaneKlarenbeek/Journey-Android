@@ -36,7 +36,8 @@ import com.example.journey.R
 @Composable
 fun JourneyStatusPage(
     modifier: Modifier = Modifier,
-    journeyName: String
+    journeyName: String,
+    onEndClick: () -> Unit = {},
 ){
     Box(
         modifier = Modifier
@@ -50,6 +51,8 @@ fun JourneyStatusPage(
 
             modifier = Modifier
         ){
+            Spacer(modifier = Modifier.height(16.dp))
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -101,7 +104,7 @@ fun JourneyStatusPage(
             Row(){
                 ElevatedButton(
                     modifier = Modifier,
-                    onClick = { /*TODO*/ },
+                    onClick = { onEndClick() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
                 ) {
                     Text(

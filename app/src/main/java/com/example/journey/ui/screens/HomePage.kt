@@ -75,6 +75,7 @@ fun HomePage(
     onSaveTemplate: (String, List<String>) -> Unit = { _, _ -> },
     onDeleteTemplate: (JourneyTemplate) -> Unit = {},
     onEditTemplate: (templateId: Long, newName: String, newStops: List<String>) -> Unit,
+    onJourneyStart: (JourneyTemplateWithStops) -> Unit,
 ){
     var isMenuExpanded by remember { mutableStateOf(false) }
     var showCreateTemplateDialog by remember { mutableStateOf(false) }
@@ -136,7 +137,7 @@ fun HomePage(
                                 ) {
                                     Text(
                                         text = "New Template",
-                                        color = Color.White,
+                                        color = Color.Black,
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                     )
                                 }
@@ -147,7 +148,7 @@ fun HomePage(
                                         showCreateTemplateDialog = true
                                     },
                                     containerColor = Color(0xFF927155),
-                                    contentColor = Color.White
+                                    contentColor = Color.Black
                                 ) {
                                     Text("+")
                                 }
@@ -158,7 +159,7 @@ fun HomePage(
                     }
 
                     /*************************
-                     * Floating Action Button for viewing the action meny
+                     * Floating Action Button for viewing the action menu
                      **************************/
                     FloatingActionButton(
                         onClick = {
@@ -173,12 +174,12 @@ fun HomePage(
                             Text(
                                 text = "X",
                                 fontSize = 24.sp,
-                                color = Color.White,
+                                color = Color.Black,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         } else {
                             Image(
-                                painter = painterResource(id = R.drawable.add_template_no_background_white),
+                                painter = painterResource(id = R.drawable.add_template_no_background_black),
                                 contentDescription = "Menu",
                                 modifier = Modifier.size(32.dp)
                             )
@@ -252,7 +253,7 @@ fun HomePage(
                                 templateData = templateData,
                                 onEdit = { templateToEdit = templateData },
                                 onDelete = { onDeleteTemplate(templateData.template) },
-                                onStartJourney = {  }
+                                onStart = { onJourneyStart(templateData) },
                             )
                         }
                     }
@@ -616,7 +617,7 @@ fun TemplateListItem(
     templateData: JourneyTemplateWithStops,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onStartJourney: () -> Unit
+    onStart: () -> Unit
 )
 {
     var showMenu by remember { mutableStateOf(false) }
@@ -648,7 +649,7 @@ fun TemplateListItem(
             }
 
             Box{
-                IconButton(onClick = { onStartJourney() }) {
+                IconButton(onClick = { onStart() }) {
                     Image(
                         painter = painterResource(id = R.drawable.play_icon_green),
                         contentDescription = "Template Options",

@@ -21,8 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.journey.viewmodel.MainViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.ui.screens.HomePage
+import com.example.journey.ui.screens.JourneyStatusPage
 import com.example.journey.viewmodel.AppState
 
 //import com.example.journey.data.local.entity.Journey
@@ -107,20 +110,47 @@ class MainActivity : ComponentActivity() {
                         // Grab the live list of templates!
                         val templates by mainViewModel.templates.collectAsState()
 
-                        HomePage(
-                            userName = firstName,
-                            templates = templates,
-                            onCreateTemplateClick = {  },
-                            onSaveTemplate = { name, stops ->
-                                mainViewModel.saveTemplate(name, stops)
-                            },
-                            onDeleteTemplate = { template ->
-                                mainViewModel.deleteTemplate(template)
-                            },
-                            onEditTemplate = { templateId, newName, newStops ->
-                                mainViewModel.UpdateTemplate(templateId, newName, newStops)
+                        val mainNavController = rememberNavController()
+
+
+                        NavHost(navController = mainNavController, startDestination = "HomePage"){
+                            composable("HomePage"){
+                                HomePage(
+                                    userName = firstName,
+                                    templates = templates,
+                                    onCreateTemplateClick = { },
+                                    onSaveTemplate = { name, stops ->
+                                        mainViewModel.saveTemplate(name, stops)
+                                    },
+                                    onDeleteTemplate = { template ->
+                                        mainViewModel.deleteTemplate(template)
+                                    },
+                                    onEditTemplate = { templateId, newName, newStops ->
+                                        mainViewModel.UpdateTemplate(templateId, newName, newStops)
+                                    },
+                                    onJourneyStart = { templateId ->
+                                        val id = templateId.template.templateId
+                                        mainNavController.navigate("JourneyStatus/$id")
+                                        Log.d("Journey ID", id.toString())
+                                    }
+                                )
                             }
-                        )
+                            composable(
+                                route = "JourneyStatus/{templateId}",
+                                arguments = listOf(navArgument("templateId") { type = NavType.LongType })
+                            ){ backStackEntry ->
+                                val templateId = backStackEntry.arguments?.getLong("templateId") ?:0
+
+                                val template = templates.find { it.template.templateId == templateId }
+
+                                val currentName = template?.template?.title ?: "Loading..."
+
+                                JourneyStatusPage(
+                                    journeyName = currentName,
+                                    onEndClick = { mainNavController.navigate("HomePage") }
+                                )
+                            }
+                        }
                     }
                 }
             }
