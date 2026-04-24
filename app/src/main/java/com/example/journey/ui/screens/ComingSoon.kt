@@ -37,7 +37,6 @@ fun ComingSoon(){
                 contentDescription = "Location Icon",
                 modifier = Modifier
                     .size(50.dp),
-                    //.border(width = 2.dp, color = Color.Black, shape = RoundedCornerShape(12.dp))
             )
             Text(
                 text = "Coming Soon",
