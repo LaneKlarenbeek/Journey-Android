@@ -16,14 +16,22 @@ import com.example.journey.ui.screens.Login
 import com.example.journey.ui.screens.LoginScreen
 import com.example.journey.ui.screens.TransitionPage
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.journey.viewmodel.MainViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.journey.data.local.entity.JourneyRecord
+import com.example.journey.data.local.entity.JourneyRecordWithDetails
 import com.example.journey.data.local.entity.JourneyTemplate
+import com.example.journey.data.local.entity.JourneyTemplateWithStops
+import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.ui.screens.HomePage
 import com.example.journey.ui.screens.JourneyStatusPage
 import com.example.journey.viewmodel.AppState
@@ -44,11 +52,19 @@ class MainActivity : ComponentActivity() {
 
                 if(modelClass.isAssignableFrom(MainViewModel::class.java)){
                     @Suppress("UNCHECKED_CAST")
-                    return MainViewModel(database.userDao(),database.journeyTemplateDao()) as T
+                    return MainViewModel(
+                        database.userDao(),
+                        database.journeyTemplateDao(),
+                        database.journeyRecordDao()
+                    ) as T
                 }
 
                 @Suppress("UNCHECKED_CAST")
-                return MainViewModel(database.userDao(),database.journeyTemplateDao()) as T
+                return MainViewModel(
+                    database.userDao(),
+                    database.journeyTemplateDao(),
+                    database.journeyRecordDao()
+                ) as T
             }
         }
     }
@@ -128,27 +144,35 @@ class MainActivity : ComponentActivity() {
                                     onEditTemplate = { templateId, newName, newStops ->
                                         mainViewModel.UpdateTemplate(templateId, newName, newStops)
                                     },
-                                    onJourneyStart = { templateId ->
-                                        val id = templateId.template.templateId
-                                        mainNavController.navigate("JourneyStatus/$id")
-                                        Log.d("Journey ID", id.toString())
+                                    onJourneyStart = { templateData ->
+                                        mainViewModel.startNewJourney(templateData) { newRecordId ->
+                                            mainNavController.navigate("JourneyStatus/$newRecordId")
+                                        }
                                     }
                                 )
                             }
                             composable(
-                                route = "JourneyStatus/{templateId}",
-                                arguments = listOf(navArgument("templateId") { type = NavType.LongType })
+                                route = "JourneyStatus/{journeyId}",
+                                arguments = listOf(navArgument("journeyId") { type = NavType.LongType })
                             ){ backStackEntry ->
-                                val templateId = backStackEntry.arguments?.getLong("templateId") ?:0
+                                val journeyId = backStackEntry.arguments?.getLong("journeyId") ?:0
 
-                                val template = templates.find { it.template.templateId == templateId }
+                                val activeJourney by mainViewModel.getActiveJourneyFlow(journeyId).collectAsState(null)
 
-                                val currentName = template?.template?.title ?: "Loading..."
+                                if (activeJourney != null) {
+                                    JourneyStatusPage(
+                                        activeJourney = activeJourney!!, /*TODO: Replace the !! operator with a safer alternative*/
+                                        onCancelJourneyClick = {
+                                            mainNavController.popBackStack()
 
-                                JourneyStatusPage(
-                                    journeyName = currentName,
-                                    onEndClick = { mainNavController.navigate("HomePage") }
-                                )
+                                            mainViewModel.cancelActiveJourney(journeyId)
+                                        }
+                                    )
+                                } else {
+                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
                             }
                         }
                     }

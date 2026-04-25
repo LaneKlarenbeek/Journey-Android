@@ -21,5 +21,6 @@ data class StopRecord(
     @PrimaryKey(autoGenerate = true) val stopId: Long = 0,
     val journeyOwnerId: Long,
     val locationName: String,
-    val timeStamp: Long
+    val sequenceOrder: Int,
+    val timeStamp: Long? = null,
 )

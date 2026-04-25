@@ -3,10 +3,13 @@ package com.example.journey.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.journey.data.local.dao.JourneyRecordDao
 import com.example.journey.data.local.dao.JourneyTemplateDao
 import com.example.journey.data.local.dao.UserDao
+import com.example.journey.data.local.entity.JourneyRecord
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.JourneyTemplateWithStops
+import com.example.journey.data.local.entity.StopRecord
 import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.data.local.entity.User
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +25,11 @@ sealed class AppState {
     object Ready: AppState()
 }
 
-class MainViewModel(private val userDao: UserDao, private val journeyTemplateDao: JourneyTemplateDao): ViewModel() {
+class MainViewModel(
+    private val userDao: UserDao,
+    private val journeyTemplateDao: JourneyTemplateDao,
+    private val journeyRecordDao: JourneyRecordDao
+): ViewModel() {
 
     private val _appState = MutableStateFlow<AppState>(AppState.Loading)
     val appState: StateFlow<AppState> = _appState.asStateFlow()
@@ -144,6 +151,48 @@ class MainViewModel(private val userDao: UserDao, private val journeyTemplateDao
 
             } catch(e: Exception){
                 Log.e("DatabaseTest", "Failed to update template: ${e.message}", e)
+            }
+        }
+    }
+
+    fun startNewJourney(template: JourneyTemplateWithStops, onJourneyStarted: (Long) -> Unit){
+        viewModelScope.launch {
+            try{
+                val newRecord = JourneyRecord(
+                    title = template.template.title,
+                    startTimeStamp = System.currentTimeMillis()
+                )
+                val newJourneyId = journeyRecordDao.insertJourneyRecord(newRecord)
+
+                val stopRecords = template.stops.map { stopTemplate ->
+                    StopRecord(
+                        journeyOwnerId = newJourneyId,
+                        locationName = stopTemplate.locationName,
+                        sequenceOrder = stopTemplate.sequenceOrder
+                    )
+                }
+
+                journeyRecordDao.insertStopRecords(stopRecords)
+
+                onJourneyStarted(newJourneyId)
+            } catch (e: Exception){
+                Log.e("DatabaseTest", "Failed to start new journey: ${e.message}", e)
+            }
+        }
+    }
+    fun getActiveJourneyFlow(journeyId: Long) = journeyRecordDao.getActiveJourneyById(journeyId)
+
+    fun cancelActiveJourney(journeyId: Long){
+        viewModelScope.launch{
+            try {
+                val recordToDelete =
+                    JourneyRecord(journeyId = journeyId, title = "", startTimeStamp = 0)
+
+                journeyRecordDao.deleteJourneyRecord(recordToDelete)
+                Log.d("DatabaseTest", "SUCCESS! Journey $journeyId cancelled.")
+
+            } catch (e: Exception) {
+                Log.e("DatabaseTest", "Failed to cancel journey: ${e.message}", e)
             }
         }
     }
