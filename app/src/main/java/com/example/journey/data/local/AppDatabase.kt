@@ -7,14 +7,20 @@ import com.example.journey.data.local.dao.UserDao
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.data.local.entity.User
+import com.example.journey.data.local.entity.JourneyRecord
+import com.example.journey.data.local.entity.StopRecord
+import com.example.journey.data.local.entity.NoteRecord
 
 @Database(
     entities = [
         User::class,
         JourneyTemplate::class,
-        StopTemplate::class
+        StopTemplate::class,
+        JourneyRecord::class,
+        StopRecord::class,
+        NoteRecord::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

@@ -1,18 +1,15 @@
 package com.example.journey.data.local.entity
 
-import androidx.room.*
-
 import androidx.room.Embedded
 import androidx.room.Relation
-/*
 
-data class JourneyWithStops(
-    @Embedded val journey: Journey,
+data class JourneyRecordWithDetails(
+    @Embedded val journey: JourneyRecord,
 
     @Relation(
+        entity = StopRecord::class,
         parentColumn = "journeyId",
         entityColumn = "journeyOwnerId"
     )
-    val stops: List<Stop>
+    val stopsWithNotes: List<StopRecordWithNotes>
 )
-*/
