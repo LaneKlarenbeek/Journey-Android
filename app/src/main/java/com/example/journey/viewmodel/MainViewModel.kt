@@ -189,10 +189,27 @@ class MainViewModel(
                     JourneyRecord(journeyId = journeyId, title = "", startTimeStamp = 0)
 
                 journeyRecordDao.deleteJourneyRecord(recordToDelete)
+
+
                 Log.d("DatabaseTest", "SUCCESS! Journey $journeyId cancelled.")
 
             } catch (e: Exception) {
                 Log.e("DatabaseTest", "Failed to cancel journey: ${e.message}", e)
+            }
+        }
+    }
+
+    fun markStopCompleted(stop: StopRecord){
+
+       viewModelScope.launch{
+            try {
+                val completedStop = stop.copy(timeStamp = System.currentTimeMillis())
+
+                journeyRecordDao.updateStopRecord(completedStop)
+
+                Log.d("DatabaseTest", "SUCCESS! ${stop.locationName} stamped at ${completedStop.timeStamp}.")
+            } catch (e: Exception) {
+                Log.e("DatabaseTest", "Failed to mark stop complete: ${e.message}", e)
             }
         }
     }

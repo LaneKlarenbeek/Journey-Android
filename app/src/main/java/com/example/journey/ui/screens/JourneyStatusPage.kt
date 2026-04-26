@@ -1,5 +1,6 @@
 package com.example.journey.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,13 +12,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,6 +41,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.lazy.items
 import com.example.journey.R
 import com.example.journey.data.local.entity.JourneyRecord
 import com.example.journey.data.local.entity.JourneyRecordWithDetails
@@ -43,6 +52,17 @@ import com.example.journey.data.local.entity.StopRecordWithNotes
 import com.example.journey.data.local.entity.StopTemplate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.intl.Locale
+import java.sql.Date
+import java.sql.Time
+import java.text.SimpleDateFormat
+
+public data class ListObject(
+    val name: String,
+    val stop: String,
+    val timeStamp: Long
+)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +71,7 @@ fun JourneyStatusPage(
     activeJourney: JourneyRecordWithDetails,
     onCancelJourneyClick: () -> Unit = {},
     onNoteClick: () -> Unit = {},
-    onNextClick: () -> Unit = {},
+    onNextClick: (StopRecord) -> Unit = {},
 ){
 
     var currentStopIndex by remember { mutableStateOf(0) }
@@ -63,6 +83,22 @@ fun JourneyStatusPage(
 
     val currentStopName = stops.getOrNull(currentStopIndex)?.stop?.locationName ?: ""
     val nextStopName = stops.getOrNull(currentStopIndex + 1)?.stop?.locationName ?: "Finished"
+
+    val listObjects = remember(activeJourney) {
+        activeJourney.stopsWithNotes.flatMap { stopWithNotes ->
+            val items = mutableListOf<ListObject>()
+            // Add the stop reached event if it has a timestamp
+            stopWithNotes.stop.timeStamp?.let { ts ->
+                items.add(ListObject(name = "Stop Reached", stop = stopWithNotes.stop.locationName, timeStamp = ts))
+            }
+            // Add any notes associated with this stop
+            stopWithNotes.notes.forEach { note ->
+                items.add(ListObject(name = "Note", stop = stopWithNotes.stop.locationName, timeStamp = note.timeStamp))
+            }
+            items
+        }.sortedBy { it.timeStamp }
+    }
+
 
     Box(
         modifier = Modifier
@@ -204,21 +240,26 @@ fun JourneyStatusPage(
             //Journey notes box shows the timestamps as well as any notes added to the journey
             Surface(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.Transparent)
-                    .height(350.dp),
+                    .fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             ){
-                Column(
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
+                        .fillMaxWidth()
+                        .weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ){
-                    /*TODO: Create table sections (Sort of like a table) to store the notes & timestamps in*/
-
+                    /*TODO: Create sections (Sort of like a table) to store the notes & timestamps in*/
+                    //table that lists the timestamps of all stops and notes.
+                    items(listObjects) { item ->
+                        TimeTableListItem(
+                            title = item.name,
+                            stop = item.stop,
+                            timeStamp = item.timeStamp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
-
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -228,13 +269,12 @@ fun JourneyStatusPage(
                 ElevatedButton(
                     modifier = Modifier,
                     onClick = { showCancelDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
                 ) {
                     Text(
                         text = "Cancel",
-                        fontSize = 20.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color.Red
                     )
                 }
 
@@ -257,7 +297,16 @@ fun JourneyStatusPage(
 
                 ElevatedButton(
                     modifier = Modifier,
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        val currentStop = stops.getOrNull(currentStopIndex)?.stop
+                        if(currentStop != null){
+                            onNextClick(currentStop)
+
+                            if(currentStopIndex < stops.size){
+                                currentStopIndex++
+                            }
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
                 ) {
                     Text(
@@ -342,4 +391,51 @@ fun JourneyStatusPagePreview(){
     val testAcitveJourney = JourneyRecordWithDetails(journey = activeJourneyRecord, stopsWithNotes = stops)
 
     JourneyStatusPage(activeJourney = testAcitveJourney)
+}
+
+@Composable
+fun TimeTableListItem(
+    title: String,
+    stop: String,
+    timeStamp: Long
+){
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                modifier = Modifier.weight(1f),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+
+            Text(
+                text = stop,
+                modifier = Modifier.weight(1.5f),
+                fontSize = 14.sp,
+                color = Color.DarkGray
+            )
+
+            val formatter = SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+            val formattedTime: String = formatter.format(java.util.Date(timeStamp))
+
+            Text(
+                text = formattedTime,
+                modifier = Modifier.weight(0.7f),
+                fontSize = 14.sp,
+                textAlign = TextAlign.End,
+                color = Color.Gray
+            )
+        }
+    }
 }

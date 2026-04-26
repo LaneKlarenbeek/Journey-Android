@@ -164,8 +164,11 @@ class MainActivity : ComponentActivity() {
                                         activeJourney = activeJourney!!, /*TODO: Replace the !! operator with a safer alternative*/
                                         onCancelJourneyClick = {
                                             mainNavController.popBackStack()
-
                                             mainViewModel.cancelActiveJourney(journeyId)
+                                        },
+                                        onNoteClick = {},
+                                        onNextClick = { stopRecord ->
+                                            mainViewModel.markStopCompleted(stopRecord)
                                         }
                                     )
                                 } else {
