@@ -1,8 +1,10 @@
 package com.example.journey.viewmodel
 
 import android.util.Log
+import android.util.Log.e
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.journey.MainActivity
 import com.example.journey.data.local.dao.JourneyRecordDao
 import com.example.journey.data.local.dao.JourneyTemplateDao
 import com.example.journey.data.local.dao.NoteDao
@@ -76,7 +78,7 @@ class MainViewModel(
                 _appState.value = AppState.Ready
 
             } catch(e: Exception){
-                Log.e("DatabaseTest", "ViewModel failed to save: $firstName $lastName")
+                Log.e("DatabaseTest", "ViewModel failed to save: $firstName $lastName, with error: $e")
 
             }
         }
@@ -133,7 +135,7 @@ class MainViewModel(
         }
     }
 
-    fun UpdateTemplate(templateId: Long, newName: String, newStops: List<String>){
+    fun updateTemplate(templateId: Long, newName: String, newStops: List<String>){
         viewModelScope.launch{
             try{
                 val updatedTemplate = JourneyTemplate(templateId, newName)
@@ -229,6 +231,23 @@ class MainViewModel(
 
             } catch (e: Exception) {
                 Log.e("DatabaseTest", "Failed to add note: ${e.message}", e)
+            }
+        }
+    }
+
+    fun updateJourneyEndTimeStamp(activeJourney: JourneyRecord){
+        viewModelScope.launch{
+            try {
+
+                val updatedJourney = JourneyRecord(
+                    journeyId = activeJourney.journeyId,
+                    title = activeJourney.title,
+                    startTimeStamp = activeJourney.startTimeStamp,
+                    endTimeStamp = System.currentTimeMillis()
+                )
+                journeyRecordDao.updateJourneyRecord(updatedJourney)
+            } catch (e: Exception) {
+                Log.e("DatabaseTest", "Failed to update the Journey end time")
             }
         }
     }

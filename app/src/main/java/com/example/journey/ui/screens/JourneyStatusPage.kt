@@ -1,7 +1,5 @@
 package com.example.journey.ui.screens
 
-import android.app.Dialog
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,20 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,27 +39,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import com.example.journey.R
 import com.example.journey.data.local.entity.JourneyRecord
 import com.example.journey.data.local.entity.JourneyRecordWithDetails
-import com.example.journey.data.local.entity.JourneyTemplate
-import com.example.journey.data.local.entity.JourneyTemplateWithStops
 import com.example.journey.data.local.entity.StopRecord
 import com.example.journey.data.local.entity.StopRecordWithNotes
-import com.example.journey.data.local.entity.StopTemplate
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.modifier.modifierLocalOf
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.intl.Locale
-import kotlinx.coroutines.processNextEventInCurrentThread
-import java.sql.Date
-import java.sql.Time
 import java.text.SimpleDateFormat
 import androidx.compose.ui.window.Dialog
-import com.example.journey.data.local.entity.NoteRecord
 
-public data class ListObject(
+data class ListObject(
     val name: String,
     val stop: String,
     val stopId: Int,
@@ -84,13 +67,13 @@ fun JourneyStatusPage(
     onEndClick: () -> Unit = {},
 ){
 
-    var currentStopIndex by remember { mutableStateOf(0) }
+    var currentStopIndex by remember { mutableIntStateOf(0) }
     var showCancelDialog by remember { mutableStateOf(false) }
     var showAddNoteDialog by remember { mutableStateOf(false)}
 
     var newNoteName by remember { mutableStateOf("") }
 
-    val stops = activeJourney?.stopsWithNotes?.sortedBy { it.stop.sequenceOrder } ?: emptyList()
+    val stops = activeJourney.stopsWithNotes.sortedBy { it.stop.sequenceOrder }
 
 
     val currentStopName = stops.getOrNull(currentStopIndex)?.stop?.locationName ?: "Finished"
@@ -116,7 +99,7 @@ fun JourneyStatusPage(
 
             // Add any notes associated with this stop
             stopWithNotes.notes.forEach { note ->
-                items.add(ListObject(name = "Note", stop = stopWithNotes.stop.locationName, stopId = currentStopIndex, timeStamp = note.timeStamp))
+                items.add(ListObject(name = stopWithNotes.stop.locationName, stop = note.noteText, stopId = currentStopIndex, timeStamp = note.timeStamp))
             }
         }
 
@@ -287,7 +270,7 @@ fun JourneyStatusPage(
             }
 
             //Row of buttons
-            Row(){
+            Row{
                 ElevatedButton(
                     modifier = Modifier,
                     onClick = { showCancelDialog = true },
@@ -334,8 +317,6 @@ fun JourneyStatusPage(
                                 }
                             }
                         } else if(currentStopIndex == stops.size){
-                            /*TODO Create different onClick event based on being the end of the journey*/
-                            /*TODO Create the logic for saving the completed journey to the database*/
                             onEndClick()
                         }
                     },
@@ -503,9 +484,9 @@ fun JourneyStatusPagePreview(){
         )
     )
 
-    val testAcitveJourney = JourneyRecordWithDetails(journey = activeJourneyRecord, stopsWithNotes = stops)
+    val testActiveJourney = JourneyRecordWithDetails(journey = activeJourneyRecord, stopsWithNotes = stops)
 
-    //JourneyStatusPage(activeJourney = testAcitveJourney)
+    //JourneyStatusPage(activeJourney = testActiveJourney)
 }
 
 @Composable

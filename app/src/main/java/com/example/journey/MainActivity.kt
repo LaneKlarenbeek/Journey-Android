@@ -1,8 +1,6 @@
 package com.example.journey
 
 import android.os.Bundle
-import android.transition.Transition
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,7 +13,6 @@ import com.example.journey.ui.screens.CreateAccount
 import com.example.journey.ui.screens.Login
 import com.example.journey.ui.screens.LoginScreen
 import com.example.journey.ui.screens.TransitionPage
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,18 +25,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.journey.data.local.entity.JourneyRecord
-import com.example.journey.data.local.entity.JourneyRecordWithDetails
-import com.example.journey.data.local.entity.JourneyTemplate
-import com.example.journey.data.local.entity.JourneyTemplateWithStops
-import com.example.journey.data.local.entity.NoteRecord
-import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.ui.screens.HomePage
 import com.example.journey.ui.screens.JourneyStatusPage
 import com.example.journey.viewmodel.AppState
 
-//import com.example.journey.data.local.entity.Journey
-//import com.example.journey.data.repository.JourneyRepository
-//import com.example.journey.viewmodel.JourneyViewModel
 
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels{
@@ -145,7 +134,7 @@ class MainActivity : ComponentActivity() {
                                         mainViewModel.deleteTemplate(template)
                                     },
                                     onEditTemplate = { templateId, newName, newStops ->
-                                        mainViewModel.UpdateTemplate(templateId, newName, newStops)
+                                        mainViewModel.updateTemplate(templateId, newName, newStops)
                                     },
                                     onJourneyStart = { templateData ->
                                         mainViewModel.startNewJourney(templateData) { newRecordId ->
@@ -175,7 +164,13 @@ class MainActivity : ComponentActivity() {
                                         onNextClick = { stopRecord ->
                                             mainViewModel.markStopCompleted(stopRecord)
                                         },
-                                        onEndClick = {},
+                                        onEndClick = {
+
+                                            if(activeJourney != null){
+                                                mainViewModel.updateJourneyEndTimeStamp(activeJourney!!.journey)
+                                            }
+                                            mainNavController.popBackStack()
+                                        },
                                     )
                                 } else {
                                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
