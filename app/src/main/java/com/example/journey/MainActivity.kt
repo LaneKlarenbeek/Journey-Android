@@ -31,6 +31,7 @@ import com.example.journey.data.local.entity.JourneyRecord
 import com.example.journey.data.local.entity.JourneyRecordWithDetails
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.JourneyTemplateWithStops
+import com.example.journey.data.local.entity.NoteRecord
 import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.ui.screens.HomePage
 import com.example.journey.ui.screens.JourneyStatusPage
@@ -55,7 +56,8 @@ class MainActivity : ComponentActivity() {
                     return MainViewModel(
                         database.userDao(),
                         database.journeyTemplateDao(),
-                        database.journeyRecordDao()
+                        database.journeyRecordDao(),
+                        database.noteDao()
                     ) as T
                 }
 
@@ -63,7 +65,8 @@ class MainActivity : ComponentActivity() {
                 return MainViewModel(
                     database.userDao(),
                     database.journeyTemplateDao(),
-                    database.journeyRecordDao()
+                    database.journeyRecordDao(),
+                    database.noteDao()
                 ) as T
             }
         }
@@ -166,10 +169,13 @@ class MainActivity : ComponentActivity() {
                                             mainNavController.popBackStack()
                                             mainViewModel.cancelActiveJourney(journeyId)
                                         },
-                                        onNoteClick = {},
+                                        addNoteAction = { stopId, text ->
+                                            mainViewModel.addNewJourneyNote(stopId, text)
+                                        },
                                         onNextClick = { stopRecord ->
                                             mainViewModel.markStopCompleted(stopRecord)
-                                        }
+                                        },
+                                        onEndClick = {},
                                     )
                                 } else {
                                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

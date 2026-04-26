@@ -5,10 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.journey.data.local.dao.JourneyRecordDao
 import com.example.journey.data.local.dao.JourneyTemplateDao
+import com.example.journey.data.local.dao.NoteDao
 import com.example.journey.data.local.dao.UserDao
 import com.example.journey.data.local.entity.JourneyRecord
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.JourneyTemplateWithStops
+import com.example.journey.data.local.entity.NoteRecord
 import com.example.journey.data.local.entity.StopRecord
 import com.example.journey.data.local.entity.StopTemplate
 import com.example.journey.data.local.entity.User
@@ -28,7 +30,8 @@ sealed class AppState {
 class MainViewModel(
     private val userDao: UserDao,
     private val journeyTemplateDao: JourneyTemplateDao,
-    private val journeyRecordDao: JourneyRecordDao
+    private val journeyRecordDao: JourneyRecordDao,
+    private val noteDao: NoteDao
 ): ViewModel() {
 
     private val _appState = MutableStateFlow<AppState>(AppState.Loading)
@@ -199,9 +202,8 @@ class MainViewModel(
         }
     }
 
-    fun markStopCompleted(stop: StopRecord){
-
-       viewModelScope.launch{
+    fun markStopCompleted(stop: StopRecord) {
+        viewModelScope.launch {
             try {
                 val completedStop = stop.copy(timeStamp = System.currentTimeMillis())
 
@@ -210,6 +212,23 @@ class MainViewModel(
                 Log.d("DatabaseTest", "SUCCESS! ${stop.locationName} stamped at ${completedStop.timeStamp}.")
             } catch (e: Exception) {
                 Log.e("DatabaseTest", "Failed to mark stop complete: ${e.message}", e)
+            }
+        }
+    }
+
+    fun addNewJourneyNote(stopId: Long, text: String){
+        viewModelScope.launch{
+            try{
+                val newNote = NoteRecord(
+                    stopOwnerId = stopId,
+                    noteText = text,
+                    timeStamp = System.currentTimeMillis()
+                )
+                noteDao.insertNote(newNote)
+                Log.d("DatabaseTest", "SUCCESS! Note added to Stop $stopId")
+
+            } catch (e: Exception) {
+                Log.e("DatabaseTest", "Failed to add note: ${e.message}", e)
             }
         }
     }

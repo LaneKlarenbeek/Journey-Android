@@ -1,5 +1,6 @@
 package com.example.journey.ui.screens
 
+import android.app.Dialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +43,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import com.example.journey.R
 import com.example.journey.data.local.entity.JourneyRecord
 import com.example.journey.data.local.entity.JourneyRecordWithDetails
@@ -52,15 +56,20 @@ import com.example.journey.data.local.entity.StopRecordWithNotes
 import com.example.journey.data.local.entity.StopTemplate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.intl.Locale
+import kotlinx.coroutines.processNextEventInCurrentThread
 import java.sql.Date
 import java.sql.Time
 import java.text.SimpleDateFormat
+import androidx.compose.ui.window.Dialog
+import com.example.journey.data.local.entity.NoteRecord
 
 public data class ListObject(
     val name: String,
     val stop: String,
+    val stopId: Int,
     val timeStamp: Long
 )
 
@@ -70,35 +79,50 @@ public data class ListObject(
 fun JourneyStatusPage(
     activeJourney: JourneyRecordWithDetails,
     onCancelJourneyClick: () -> Unit = {},
-    onNoteClick: () -> Unit = {},
+    addNoteAction: (stopId: Long, noteText: String) -> Unit,
     onNextClick: (StopRecord) -> Unit = {},
+    onEndClick: () -> Unit = {},
 ){
 
     var currentStopIndex by remember { mutableStateOf(0) }
-
     var showCancelDialog by remember { mutableStateOf(false) }
+    var showAddNoteDialog by remember { mutableStateOf(false)}
 
-    val journeyName = activeJourney.journey.title
+    var newNoteName by remember { mutableStateOf("") }
+
     val stops = activeJourney?.stopsWithNotes?.sortedBy { it.stop.sequenceOrder } ?: emptyList()
 
-    val currentStopName = stops.getOrNull(currentStopIndex)?.stop?.locationName ?: ""
-    val nextStopName = stops.getOrNull(currentStopIndex + 1)?.stop?.locationName ?: "Finished"
+
+    val currentStopName = stops.getOrNull(currentStopIndex)?.stop?.locationName ?: "Finished"
+    val nextStopName = stops.getOrNull(currentStopIndex + 1)?.stop?.locationName ?: ""
 
     val listObjects = remember(activeJourney) {
-        activeJourney.stopsWithNotes.flatMap { stopWithNotes ->
-            val items = mutableListOf<ListObject>()
+        val items = mutableListOf<ListObject>()
+
+        items.add(
+            ListObject(
+                name = "Start",
+                stop = "---",
+                stopId = -1,
+                timeStamp = activeJourney.journey.startTimeStamp
+            )
+        )
+
+        activeJourney.stopsWithNotes.forEach { stopWithNotes ->
             // Add the stop reached event if it has a timestamp
             stopWithNotes.stop.timeStamp?.let { ts ->
-                items.add(ListObject(name = "Stop Reached", stop = stopWithNotes.stop.locationName, timeStamp = ts))
+                items.add(ListObject(name = "Stop", stop = stopWithNotes.stop.locationName, stopId = currentStopIndex, timeStamp = ts))
             }
+
             // Add any notes associated with this stop
             stopWithNotes.notes.forEach { note ->
-                items.add(ListObject(name = "Note", stop = stopWithNotes.stop.locationName, timeStamp = note.timeStamp))
+                items.add(ListObject(name = "Note", stop = stopWithNotes.stop.locationName, stopId = currentStopIndex, timeStamp = note.timeStamp))
             }
-            items
-        }.sortedBy { it.timeStamp }
-    }
+        }
 
+        // 3. Sort the entire combined list by timestamp so everything appears in order
+        items.sortedBy { it.timeStamp }
+    }
 
     Box(
         modifier = Modifier
@@ -110,10 +134,11 @@ fun JourneyStatusPage(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
 
-            modifier = Modifier
+            modifier = Modifier.fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
+            //Header
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,8 +202,6 @@ fun JourneyStatusPage(
                                     textDecoration = TextDecoration.Underline,
                                     color = Color.Black
                                 )
-
-                                /*TODO: Get the current stop name from the database*/
                                 Text(
                                     text = currentStopName,
                                     fontSize = 20.sp,
@@ -191,6 +214,7 @@ fun JourneyStatusPage(
                     }
                 }
 
+                //Next Stop Side of the Row
                 Surface(
                     modifier = Modifier
                         .width(150.dp)
@@ -221,7 +245,6 @@ fun JourneyStatusPage(
                                     textDecoration = TextDecoration.Underline,
                                     color = Color.Black
                                 )
-                                /*TODO: Get the next stop name from the database*/
                                 Text(
                                     text = nextStopName,
                                     fontSize = 20.sp,
@@ -237,20 +260,21 @@ fun JourneyStatusPage(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            //Journey notes box shows the timestamps as well as any notes added to the journey
+            //Journey Notes Section that shows Stops as well as Any Notes added.
             Surface(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
+                shape = RoundedCornerShape(12.dp),
+                color = Color.Transparent,
+
             ){
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ){
-                    /*TODO: Create sections (Sort of like a table) to store the notes & timestamps in*/
-                    //table that lists the timestamps of all stops and notes.
+                    //Table that lists the timestamps of all stops and notes.
                     items(listObjects) { item ->
                         TimeTableListItem(
                             title = item.name,
@@ -261,8 +285,6 @@ fun JourneyStatusPage(
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.weight(1f))
 
             //Row of buttons
             Row(){
@@ -282,7 +304,10 @@ fun JourneyStatusPage(
 
                 ElevatedButton(
                     modifier = Modifier,
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        /*TODO: Create Note and add it to list*/
+                        showAddNoteDialog = true
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
                 ) {
                     Text(
@@ -298,27 +323,43 @@ fun JourneyStatusPage(
                 ElevatedButton(
                     modifier = Modifier,
                     onClick = {
-                        val currentStop = stops.getOrNull(currentStopIndex)?.stop
-                        if(currentStop != null){
-                            onNextClick(currentStop)
 
-                            if(currentStopIndex < stops.size){
-                                currentStopIndex++
+                        if(currentStopIndex < stops.size){
+                            val currentStop = stops.getOrNull(currentStopIndex)?.stop
+                            if (currentStop != null) {
+                                onNextClick(currentStop)
+
+                                if (currentStopIndex < stops.size) {
+                                    currentStopIndex++
+                                }
                             }
+                        } else if(currentStopIndex == stops.size){
+                            /*TODO Create different onClick event based on being the end of the journey*/
+                            /*TODO Create the logic for saving the completed journey to the database*/
+                            onEndClick()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
                 ) {
-                    Text(
-                        text = "Next",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
+                    if(currentStopIndex < stops.size){
+                        Text(
+                            text = "Next",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    } else if(currentStopIndex == stops.size){
+                        Text(
+                            text = "End",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    }
                 }
             }
-
         }
+
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = {
@@ -361,6 +402,80 @@ fun JourneyStatusPage(
                 containerColor = Color.White
             )
         }
+
+        if(showAddNoteDialog){
+            Dialog(
+                onDismissRequest = { showAddNoteDialog = false }
+            ){
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Add Note",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF896A4E)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            value = newNoteName,
+                            onValueChange = {newNoteName = it},
+                            placeholder = { Text("e.g., Spotted mess on floor") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF927155),
+                                focusedLabelColor = Color(0xFF927155)
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            TextButton(
+                                onClick = { showAddNoteDialog = false },
+                                modifier = Modifier.padding(end = 8.dp)
+                            ) {
+                                Text("Cancel", color = Color.Gray)
+                            }
+
+                            Button(
+                                onClick = {
+                                    val currentStopId = stops.getOrNull(currentStopIndex)?.stop?.stopId
+
+                                    if(currentStopId != null && newNoteName.isNotBlank()){
+
+                                        addNoteAction(currentStopId, newNoteName)
+
+                                        newNoteName = ""
+                                        showAddNoteDialog = false
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF927155
+                                    )
+                                )
+                            ) {
+                                Text("Continue")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -390,7 +505,7 @@ fun JourneyStatusPagePreview(){
 
     val testAcitveJourney = JourneyRecordWithDetails(journey = activeJourneyRecord, stopsWithNotes = stops)
 
-    JourneyStatusPage(activeJourney = testAcitveJourney)
+    //JourneyStatusPage(activeJourney = testAcitveJourney)
 }
 
 @Composable

@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.journey.data.local.dao.JourneyRecordDao
 import com.example.journey.data.local.dao.JourneyTemplateDao
+import com.example.journey.data.local.dao.NoteDao
 import com.example.journey.data.local.dao.UserDao
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.StopTemplate
@@ -28,4 +29,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun journeyTemplateDao(): JourneyTemplateDao
     abstract fun journeyRecordDao(): JourneyRecordDao
+
+    abstract fun noteDao(): NoteDao
 }
