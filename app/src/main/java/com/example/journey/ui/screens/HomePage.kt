@@ -35,6 +35,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,8 +64,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.journey.data.local.entity.JourneyRecord
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.JourneyTemplateWithStops
+import com.example.journey.data.local.entity.StopTemplate
+import javax.xml.transform.Templates
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -228,16 +232,36 @@ fun HomePage(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    Text(
-                        text = "Templates",
+                    Row(
                         modifier = Modifier
+                            .height(25.dp)
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black,
-                        textAlign = TextAlign.Left
-                    )
+                        ,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        Text(
+                            text = "Templates",
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(horizontal = 24.dp),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            textAlign = TextAlign.Left
+                        )
+                        Text(
+                            text = "Journeys",
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(horizontal = 24.dp),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            textAlign = TextAlign.Left
+                        )
+                    }
+
+
 
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -690,4 +714,26 @@ fun TemplateListItem(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun JourneyStatusPreview(){
+
+    val temp: JourneyTemplate = JourneyTemplate(0, "Rounds",)
+    val stops: List<StopTemplate> = listOf(
+        StopTemplate(0, 0, "Higbie", 0),
+        StopTemplate(0, 0, "Residence Village", 0)
+    )
+
+
+    val tempwst: List<JourneyTemplateWithStops> = listOf(JourneyTemplateWithStops(temp, stops))
+
+    HomePage(
+        "Lane",
+        tempwst,
+        onCreateTemplateClick = {},
+        onEditTemplate = { _, _, _ -> },
+        onJourneyStart = {}
+    )
 }
