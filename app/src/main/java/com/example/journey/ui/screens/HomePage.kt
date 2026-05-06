@@ -59,6 +59,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -71,7 +72,10 @@ import com.example.journey.data.local.entity.NoteRecord
 import com.example.journey.data.local.entity.StopRecord
 import com.example.journey.data.local.entity.StopRecordWithNotes
 import com.example.journey.data.local.entity.StopTemplate
+import com.example.journey.utils.copyToClipboard
+import com.example.journey.utils.formatFullJourney
 import java.text.SimpleDateFormat
+import java.util.logging.SimpleFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -308,6 +312,9 @@ fun HomePage(
                         }
                     } else if(showCompletedJourneys){
 
+                        val dayFormatter = SimpleDateFormat("MM-dd",java.util.Locale.getDefault())
+                        val timeFormatter = SimpleDateFormat("HH:mm",java.util.Locale.getDefault())
+
                         val displayedJourneys = remember(completedJourneys) {
                             completedJourneys.reversed()
                         }
@@ -321,7 +328,9 @@ fun HomePage(
                         ) {
                             items(displayedJourneys) { journeyData ->
                                 CompletedListItem(
-                                    journeyData = journeyData
+                                    journeyData = journeyData,
+                                    dayFormatter,
+                                    timeFormatter
                                 )
 
                             }
@@ -768,8 +777,9 @@ fun TemplateListItem(
 @Composable
 fun CompletedListItem(
     journeyData: JourneyRecordWithDetails,
+    dayFormatter: SimpleDateFormat,
+    timeFormatter: SimpleDateFormat
 ){
-
     var showMenu by remember { mutableStateOf(false)}
 
     Card(
@@ -777,9 +787,7 @@ fun CompletedListItem(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-
-        val dayFormatter = SimpleDateFormat("MM-dd",java.util.Locale.getDefault())
-        val timeFormatter = SimpleDateFormat("HH:mm",java.util.Locale.getDefault())
+        val context = LocalContext.current
 
         val day: String = dayFormatter.format(java.util.Date(journeyData.journey.startTimeStamp))
         val startTime = timeFormatter.format(java.util.Date(journeyData.journey.startTimeStamp))
@@ -818,7 +826,10 @@ fun CompletedListItem(
 
             Box{
                 //Copy Button
-                IconButton(onClick = { /*TODO onCopyClick()*/ }) {
+                IconButton(onClick = {
+                    val journeySummary = formatFullJourney(journeyData, timeFormatter)
+                    context.copyToClipboard(journeySummary,"Journey Copy")
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.copy_all_black),
                         contentDescription = "Template Options",
@@ -864,7 +875,7 @@ fun CompletedListItem(
 
 @Preview(showBackground = true)
 @Composable
-fun JourneyStatusPreview(){
+fun CompletedJourneyPreview(){
 
 
     val timeStampFiller = System.currentTimeMillis()
@@ -884,7 +895,6 @@ fun JourneyStatusPreview(){
     )
 
 
-
     val newRecord = JourneyRecord(0,"Rounds",timeStampFiller,timeStampFiller)
     val newStopList: List<StopRecordWithNotes> = listOf(
         StopRecordWithNotes(stos, notesList)
@@ -901,6 +911,6 @@ fun JourneyStatusPreview(){
         templateWithStops,
         journey,
         onEditTemplate = { _, _, _ -> },
-        onJourneyStart = {}
+        onJourneyStart = {},
     )
 }
