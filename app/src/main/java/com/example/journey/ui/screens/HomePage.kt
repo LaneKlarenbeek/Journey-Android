@@ -2,7 +2,6 @@ package com.example.journey.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -27,12 +26,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.journey.R
-import com.example.journey.ui.theme.JourneyTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -65,17 +64,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.journey.data.local.entity.JourneyRecord
+import com.example.journey.data.local.entity.JourneyRecordWithDetails
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.JourneyTemplateWithStops
+import com.example.journey.data.local.entity.NoteRecord
+import com.example.journey.data.local.entity.StopRecord
+import com.example.journey.data.local.entity.StopRecordWithNotes
 import com.example.journey.data.local.entity.StopTemplate
-import javax.xml.transform.Templates
+import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(
     userName: String,
     templates: List<JourneyTemplateWithStops>,
-    onCreateTemplateClick: () -> Unit,
+    completedJourneys: List<JourneyRecordWithDetails>,
     onSaveTemplate: (String, List<String>) -> Unit = { _, _ -> },
     onDeleteTemplate: (JourneyTemplate) -> Unit = {},
     onEditTemplate: (templateId: Long, newName: String, newStops: List<String>) -> Unit,
@@ -86,6 +89,8 @@ fun HomePage(
     var showStopAddDialog by remember { mutableStateOf(false) }
     var templateToEdit by remember { mutableStateOf<JourneyTemplateWithStops?>(null) }
 
+    var showTemplateList by remember { mutableStateOf(true)}
+    var showCompletedJourneys by remember {mutableStateOf(false )}
 
     //variables to be submitted to database
     var templateName by remember { mutableStateOf("") }
@@ -203,7 +208,7 @@ fun HomePage(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Hello " + userName + "!",
+                    text = "Hello $userName!",
                     modifier = Modifier
                         .width(200.dp)
                         .fillMaxWidth(),
@@ -237,50 +242,94 @@ fun HomePage(
                             .height(25.dp)
                             .fillMaxWidth()
                         ,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ){
-                        Text(
-                            text = "Templates",
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .padding(horizontal = 24.dp),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            textAlign = TextAlign.Left
-                        )
-                        Text(
-                            text = "Journeys",
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .padding(horizontal = 24.dp),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            textAlign = TextAlign.Left
-                        )
-                    }
+                        FloatingActionButton(
+                            onClick = {
+                                showTemplateList = true
+                                showCompletedJourneys = false
+                            },
+                            containerColor = Color(0xFF927155),
+                            contentColor = Color.White,
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = "Templates",
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 24.dp),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
+                                textAlign = TextAlign.Left
+                            )
+                        }
 
-
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp)
-                            .weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(templates) { templateData ->
-                            TemplateListItem(
-                                templateData = templateData,
-                                onEdit = { templateToEdit = templateData },
-                                onDelete = { onDeleteTemplate(templateData.template) },
-                                onStart = { onJourneyStart(templateData) },
+                        FloatingActionButton(
+                            onClick = {
+                                showTemplateList = false
+                                showCompletedJourneys = true
+                            },
+                            containerColor = Color(0xFF927155),
+                            contentColor = Color.White,
+                            shape = RoundedCornerShape(12.dp)
+                        ){
+                            Text(
+                                text = "Journeys",
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 24.dp),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
+                                textAlign = TextAlign.Left
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if(showTemplateList){
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp)
+                                .weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(templates) { templateData ->
+                                TemplateListItem(
+                                    templateData = templateData,
+                                    onEdit = { templateToEdit = templateData },
+                                    onDelete = { onDeleteTemplate(templateData.template) },
+                                    onStart = { onJourneyStart(templateData) },
+                                )
+                            }
+                        }
+                    } else if(showCompletedJourneys){
+
+                        val displayedJourneys = remember(completedJourneys) {
+                            completedJourneys.reversed()
+                        }
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp)
+                                .weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(displayedJourneys) { journeyData ->
+                                CompletedListItem(
+                                    journeyData = journeyData
+                                )
+
+                            }
+                        }
+                    }
+
+
+
                 }
             }
 
@@ -716,23 +765,141 @@ fun TemplateListItem(
     }
 }
 
+@Composable
+fun CompletedListItem(
+    journeyData: JourneyRecordWithDetails,
+){
+
+    var showMenu by remember { mutableStateOf(false)}
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+
+        val dayFormatter = SimpleDateFormat("MM-dd",java.util.Locale.getDefault())
+        val timeFormatter = SimpleDateFormat("HH:mm",java.util.Locale.getDefault())
+
+        val day: String = dayFormatter.format(java.util.Date(journeyData.journey.startTimeStamp))
+        val startTime = timeFormatter.format(java.util.Date(journeyData.journey.startTimeStamp))
+        val endTime = timeFormatter.format(java.util.Date(journeyData.journey.endTimeStamp ?: (journeyData.journey.startTimeStamp + 20)))
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+
+                Text(
+                    text = journeyData.journey.title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF896A4E)
+                )
+
+                Text(
+                    text = day,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF896A4E)
+                )
+
+                Text(
+                    text = "$startTime - $endTime",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Box{
+                //Copy Button
+                IconButton(onClick = { /*TODO onCopyClick()*/ }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.copy_all_black),
+                        contentDescription = "Template Options",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            Box {
+                //Dropdown menu for selections
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.more_menu_vertical),
+                        contentDescription = "Template Options",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Edit") },
+                        onClick = {
+                            showMenu = false
+                            /*TODO*/
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Delete", color = Color.Red) },
+                        onClick = {
+                            showMenu = false
+                            /*TODO*/
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun JourneyStatusPreview(){
 
-    val temp: JourneyTemplate = JourneyTemplate(0, "Rounds",)
+
+    val timeStampFiller = System.currentTimeMillis()
+
+    val temp = JourneyTemplate(0, "Rounds")
     val stops: List<StopTemplate> = listOf(
         StopTemplate(0, 0, "Higbie", 0),
         StopTemplate(0, 0, "Residence Village", 0)
     )
 
+    val stos = StopRecord(0,0,"Higbie",0,timeStampFiller)
+    val notesList: List<NoteRecord> = listOf(
+        NoteRecord(0, 0, "Spill on floor cleaned up", timeStampFiller),
+        NoteRecord(1, 0, "Told room 308 to quiet down", timeStampFiller),
+        NoteRecord(2, 0, "Maintenance door unlocked", timeStampFiller)
 
-    val tempwst: List<JourneyTemplateWithStops> = listOf(JourneyTemplateWithStops(temp, stops))
+    )
+
+
+
+    val newRecord = JourneyRecord(0,"Rounds",timeStampFiller,timeStampFiller)
+    val newStopList: List<StopRecordWithNotes> = listOf(
+        StopRecordWithNotes(stos, notesList)
+    )
+
+    val journey: List<JourneyRecordWithDetails> = listOf(
+        JourneyRecordWithDetails(newRecord, newStopList)
+    )
+
+    val templateWithStops: List<JourneyTemplateWithStops> = listOf(JourneyTemplateWithStops(temp, stops))
 
     HomePage(
         "Lane",
-        tempwst,
-        onCreateTemplateClick = {},
+        templateWithStops,
+        journey,
         onEditTemplate = { _, _, _ -> },
         onJourneyStart = {}
     )

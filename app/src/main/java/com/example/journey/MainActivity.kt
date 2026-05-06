@@ -118,6 +118,8 @@ class MainActivity : ComponentActivity() {
                         // Grab the live list of templates!
                         val templates by mainViewModel.templates.collectAsState()
 
+                        val completedJourneys by mainViewModel.completedJourneys.collectAsState()
+
                         val mainNavController = rememberNavController()
 
 
@@ -126,7 +128,7 @@ class MainActivity : ComponentActivity() {
                                 HomePage(
                                     userName = firstName,
                                     templates = templates,
-                                    onCreateTemplateClick = { },
+                                    completedJourneys = completedJourneys,
                                     onSaveTemplate = { name, stops ->
                                         mainViewModel.saveTemplate(name, stops)
                                     },

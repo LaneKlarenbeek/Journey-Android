@@ -467,7 +467,7 @@ fun JourneyStatusPagePreview(){
 
     val journeyName = "Rounds(HH/RV/CY)"
 
-    val activeJourneyRecord = JourneyRecord(journeyId = 0, title = journeyName, startTimeStamp = 0)
+    val activeJourneyRecord = JourneyRecord(journeyId = 0, title = journeyName, startTimeStamp = 0, endTimeStamp = 0)
 
     val stops: List<StopRecordWithNotes> = listOf(
         StopRecordWithNotes(

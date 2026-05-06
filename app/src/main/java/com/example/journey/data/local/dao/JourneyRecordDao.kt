@@ -32,4 +32,8 @@ interface JourneyRecordDao {
     @Transaction
     @Query("SELECT * FROM journey_records WHERE journeyId = :journeyId")
     fun getActiveJourneyById(journeyId: Long): Flow<JourneyRecordWithDetails?>
+
+    @Transaction
+    @Query("SELECT * FROM journey_records")
+    fun getCompletedJourneysWithDetails(): Flow<List<JourneyRecordWithDetails>>
 }

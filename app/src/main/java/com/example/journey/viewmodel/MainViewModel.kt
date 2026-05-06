@@ -10,6 +10,7 @@ import com.example.journey.data.local.dao.JourneyTemplateDao
 import com.example.journey.data.local.dao.NoteDao
 import com.example.journey.data.local.dao.UserDao
 import com.example.journey.data.local.entity.JourneyRecord
+import com.example.journey.data.local.entity.JourneyRecordWithDetails
 import com.example.journey.data.local.entity.JourneyTemplate
 import com.example.journey.data.local.entity.JourneyTemplateWithStops
 import com.example.journey.data.local.entity.NoteRecord
@@ -165,7 +166,8 @@ class MainViewModel(
             try{
                 val newRecord = JourneyRecord(
                     title = template.template.title,
-                    startTimeStamp = System.currentTimeMillis()
+                    startTimeStamp = System.currentTimeMillis(),
+                    endTimeStamp = null
                 )
                 val newJourneyId = journeyRecordDao.insertJourneyRecord(newRecord)
 
@@ -191,7 +193,7 @@ class MainViewModel(
         viewModelScope.launch{
             try {
                 val recordToDelete =
-                    JourneyRecord(journeyId = journeyId, title = "", startTimeStamp = 0)
+                    JourneyRecord(journeyId = journeyId, title = "", startTimeStamp = 0, endTimeStamp = 0)
 
                 journeyRecordDao.deleteJourneyRecord(recordToDelete)
 
@@ -251,4 +253,11 @@ class MainViewModel(
             }
         }
     }
+
+    val completedJourneys: StateFlow<List<JourneyRecordWithDetails>> = journeyRecordDao.getCompletedJourneysWithDetails()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 }
