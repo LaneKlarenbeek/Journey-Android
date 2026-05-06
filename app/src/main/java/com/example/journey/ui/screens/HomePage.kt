@@ -87,6 +87,7 @@ fun HomePage(
     onDeleteTemplate: (JourneyTemplate) -> Unit = {},
     onEditTemplate: (templateId: Long, newName: String, newStops: List<String>) -> Unit,
     onJourneyStart: (JourneyTemplateWithStops) -> Unit,
+    onDeleteRecord: (journeyRecord: JourneyRecord) -> Unit
 ){
     var isMenuExpanded by remember { mutableStateOf(false) }
     var showCreateTemplateDialog by remember { mutableStateOf(false) }
@@ -174,30 +175,33 @@ fun HomePage(
                     /*************************
                      * Floating Action Button for viewing the action menu
                      **************************/
-                    FloatingActionButton(
-                        onClick = {
-                            isMenuExpanded = !isMenuExpanded
-                        },
-                        containerColor = Color(0xFF927155),
-                        contentColor = Color.White,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    {
-                        if (isMenuExpanded) {
-                            Text(
-                                text = "X",
-                                fontSize = 24.sp,
-                                color = Color.Black,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.add_template_no_background_black),
-                                contentDescription = "Menu",
-                                modifier = Modifier.size(32.dp)
-                            )
+                    if(showTemplateList) {
+                        FloatingActionButton(
+                            onClick = {
+                                isMenuExpanded = !isMenuExpanded
+                            },
+                            containerColor = Color(0xFF927155),
+                            contentColor = Color.White,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        {
+                            if (isMenuExpanded) {
+                                Text(
+                                    text = "X",
+                                    fontSize = 24.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            } else {
+                                Image(
+                                    painter = painterResource(id = R.drawable.add_template_no_background_black),
+                                    contentDescription = "Menu",
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
                         }
                     }
+
                 }
             }
         )
@@ -279,7 +283,7 @@ fun HomePage(
                             shape = RoundedCornerShape(12.dp)
                         ){
                             Text(
-                                text = "Journeys",
+                                text = "Completed",
                                 modifier = Modifier
                                     .fillMaxHeight()
                                     .padding(horizontal = 24.dp),
@@ -312,9 +316,11 @@ fun HomePage(
                         }
                     } else if(showCompletedJourneys){
 
+                        //formatters for formatting the date and time of the records in list
                         val dayFormatter = SimpleDateFormat("MM-dd",java.util.Locale.getDefault())
                         val timeFormatter = SimpleDateFormat("HH:mm",java.util.Locale.getDefault())
 
+                        //reverses the list so that the more recent data is displayed first
                         val displayedJourneys = remember(completedJourneys) {
                             completedJourneys.reversed()
                         }
@@ -330,15 +336,12 @@ fun HomePage(
                                 CompletedListItem(
                                     journeyData = journeyData,
                                     dayFormatter,
-                                    timeFormatter
+                                    timeFormatter,
+                                    onDelete = { onDeleteRecord(journeyData.journey) }
                                 )
-
                             }
                         }
                     }
-
-
-
                 }
             }
 
@@ -778,7 +781,8 @@ fun TemplateListItem(
 fun CompletedListItem(
     journeyData: JourneyRecordWithDetails,
     dayFormatter: SimpleDateFormat,
-    timeFormatter: SimpleDateFormat
+    timeFormatter: SimpleDateFormat,
+    onDelete: () -> Unit
 ){
     var showMenu by remember { mutableStateOf(false)}
 
@@ -854,17 +858,10 @@ fun CompletedListItem(
                     onDismissRequest = { showMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Edit") },
-                        onClick = {
-                            showMenu = false
-                            /*TODO*/
-                        }
-                    )
-                    DropdownMenuItem(
                         text = { Text("Delete", color = Color.Red) },
                         onClick = {
                             showMenu = false
-                            /*TODO*/
+                            onDelete()
                         }
                     )
                 }
@@ -912,5 +909,6 @@ fun CompletedJourneyPreview(){
         journey,
         onEditTemplate = { _, _, _ -> },
         onJourneyStart = {},
+        onDeleteRecord = {}
     )
 }

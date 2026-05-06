@@ -260,4 +260,15 @@ class MainViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    fun deleteCompletedJourney(journeyRecord: JourneyRecord){
+        viewModelScope.launch {
+            try{
+                journeyRecordDao.deleteJourneyRecord(journeyRecord)
+                Log.d("DatabaseTest", "SUCCESS! Journey '${journeyRecord.title}' deleted.")
+            } catch (e: Exception){
+                Log.e("DatabaseText","Failed to delete Journey Record")
+            }
+        }
+    }
 }

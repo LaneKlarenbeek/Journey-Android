@@ -142,6 +142,9 @@ class MainActivity : ComponentActivity() {
                                         mainViewModel.startNewJourney(templateData) { newRecordId ->
                                             mainNavController.navigate("JourneyStatus/$newRecordId")
                                         }
+                                    },
+                                    onDeleteRecord = { journeyRecord ->
+                                        mainViewModel.deleteCompletedJourney(journeyRecord)
                                     }
                                 )
                             }
