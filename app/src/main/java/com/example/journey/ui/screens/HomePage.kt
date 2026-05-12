@@ -280,6 +280,10 @@ fun HomePage(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    /*************************
+                     * Displays either templates page or
+                     * completed journey page based on button pressed
+                     **************************/
                     if(showTemplateList){
                         LazyColumn(
                             modifier = Modifier
@@ -329,8 +333,8 @@ fun HomePage(
             }
 
             /*********************************************
-            Below this point is supporting code
-            for the Home Page Dialog Boxes
+            * Below this point is supporting code
+            * for the Home Page Dialog Boxes
             *********************************************/
 
 
@@ -769,7 +773,6 @@ fun CompletedListItem(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         val context = LocalContext.current
@@ -792,14 +795,12 @@ fun CompletedListItem(
                     text = journeyData.journey.title,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF896A4E)
                 )
 
                 Text(
                     text = day,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF896A4E)
                 )
 
                 Text(
@@ -814,10 +815,11 @@ fun CompletedListItem(
                 IconButton(onClick = {
                     val journeySummary = formatFullJourney(journeyData, timeFormatter)
                     context.copyToClipboard(journeySummary,"Journey Copy")
-                }) {
+                }
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.copy_all_black),
-                        contentDescription = "Template Options",
+                        contentDescription = "Copy Completed Journey",
                         tint = Color.Gray,
                         modifier = Modifier.size(20.dp)
                     )
@@ -828,7 +830,7 @@ fun CompletedListItem(
                 IconButton(onClick = { showMenu = true }) {
                     Icon(
                         painter = painterResource(id = R.drawable.more_menu_vertical),
-                        contentDescription = "Template Options",
+                        contentDescription = "Journey Options",
                         tint = Color.Gray,
                         modifier = Modifier.size(20.dp)
                     )

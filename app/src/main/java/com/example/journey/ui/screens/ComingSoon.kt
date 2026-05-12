@@ -26,11 +26,10 @@ import com.example.journey.R
 fun ComingSoon(){
     Box(
         modifier = Modifier
-            .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
             .padding(14.dp),
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.location_on),
