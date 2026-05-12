@@ -59,6 +59,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -104,7 +105,7 @@ fun HomePage(
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .background(
+            /*.background(
                 brush = Brush.verticalGradient(
                     listOf(
                         Color(0xFFD0AE90),
@@ -113,8 +114,7 @@ fun HomePage(
                     startY = 0.0f,
                     endY = Float.POSITIVE_INFINITY
                 )
-            ),
-        color = Color.Transparent
+            )*/,
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -146,12 +146,10 @@ fun HomePage(
                             ) {
                                 Surface(
                                     shape = RoundedCornerShape(8.dp),
-                                    color = Color(0xFF927155),
                                     modifier = Modifier.padding(end = 4.dp)
                                 ) {
                                     Text(
                                         text = "New Template",
-                                        color = Color.Black,
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                     )
                                 }
@@ -161,8 +159,6 @@ fun HomePage(
                                         isMenuExpanded = false
                                         showCreateTemplateDialog = true
                                     },
-                                    containerColor = Color(0xFF927155),
-                                    contentColor = Color.Black
                                 ) {
                                     Text("+")
                                 }
@@ -175,33 +171,31 @@ fun HomePage(
                     /*************************
                      * Floating Action Button for viewing the action menu
                      **************************/
-                    if(showTemplateList) {
+                    if (showTemplateList) {
                         FloatingActionButton(
                             onClick = {
                                 isMenuExpanded = !isMenuExpanded
                             },
-                            containerColor = Color(0xFF927155),
-                            contentColor = Color.White,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12)
                         )
                         {
                             if (isMenuExpanded) {
-                                Text(
-                                    text = "X",
-                                    fontSize = 24.sp,
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
+                                Box {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.close_icon_black),
+                                        contentDescription = "Close Menu",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                             } else {
                                 Image(
                                     painter = painterResource(id = R.drawable.add_template_no_background_black),
                                     contentDescription = "Menu",
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                         }
                     }
-
                 }
             }
         )
@@ -227,8 +221,7 @@ fun HomePage(
                 )
 
                 Text(
-                    text = "Ready to start a Journey?",
-                    color = Color.Black,
+                    text = "Lets get started!",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 4.dp)
@@ -247,7 +240,7 @@ fun HomePage(
 
                     Row(
                         modifier = Modifier
-                            .height(25.dp)
+                            .height(35.dp)
                             .fillMaxWidth()
                         ,
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -257,19 +250,14 @@ fun HomePage(
                                 showTemplateList = true
                                 showCompletedJourneys = false
                             },
-                            containerColor = Color(0xFF927155),
-                            contentColor = Color.White,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12),
                         ) {
                             Text(
                                 text = "Templates",
                                 modifier = Modifier
-                                    .fillMaxHeight()
                                     .padding(horizontal = 24.dp),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                textAlign = TextAlign.Left
                             )
                         }
 
@@ -278,19 +266,14 @@ fun HomePage(
                                 showTemplateList = false
                                 showCompletedJourneys = true
                             },
-                            containerColor = Color(0xFF927155),
-                            contentColor = Color.White,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12)
                         ){
                             Text(
                                 text = "Completed",
                                 modifier = Modifier
-                                    .fillMaxHeight()
                                     .padding(horizontal = 24.dp),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                textAlign = TextAlign.Left
                             )
                         }
                     }
@@ -709,7 +692,6 @@ fun TemplateListItem(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -724,12 +706,11 @@ fun TemplateListItem(
                     text = templateData.template.title,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF896A4E)
                 )
                 Text(
                     text = "${templateData.stops.size} Stops",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    //color = Color.Gray
                 )
             }
 

@@ -1,7 +1,6 @@
 package com.example.journey.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +37,6 @@ import androidx.compose.runtime.remember
 
 @Composable
 fun TransitionPage(
-    modifier: Modifier = Modifier,
     onContinueClick: (firstName:String, laseName:String) -> Unit
 ){
     var firstName by remember {mutableStateOf("")}
@@ -201,7 +199,7 @@ fun TransitionPagePreview(){
                 ),
             color = Color.Transparent
         ) {
-            TransitionPage(Modifier, {_, _ -> })
+            TransitionPage(onContinueClick = { _, _ -> })
         }
     }
 }

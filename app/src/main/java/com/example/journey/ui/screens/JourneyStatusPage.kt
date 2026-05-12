@@ -48,6 +48,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import java.text.SimpleDateFormat
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.platform.LocalLocale
 
 data class ListObject(
     val name: String,
@@ -92,24 +93,20 @@ fun JourneyStatusPage(
         )
 
         activeJourney.stopsWithNotes.forEach { stopWithNotes ->
-            // Add the stop reached event if it has a timestamp
             stopWithNotes.stop.timeStamp?.let { ts ->
                 items.add(ListObject(name = "Stop", stop = stopWithNotes.stop.locationName, stopId = currentStopIndex, timeStamp = ts))
             }
 
-            // Add any notes associated with this stop
             stopWithNotes.notes.forEach { note ->
                 items.add(ListObject(name = stopWithNotes.stop.locationName, stop = note.noteText, stopId = currentStopIndex, timeStamp = note.timeStamp))
             }
         }
 
-        // 3. Sort the entire combined list by timestamp so everything appears in order
         items.sortedBy { it.timeStamp }
     }
 
-    Box(
+    Surface(
         modifier = Modifier
-            .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
             .padding(14.dp)
             .fillMaxSize(),
     ){
@@ -183,13 +180,12 @@ fun JourneyStatusPage(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     textDecoration = TextDecoration.Underline,
-                                    color = Color.Black
                                 )
                                 Text(
                                     text = currentStopName,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Black
+                                    textAlign = TextAlign.Center
                                 )
 
                             }
@@ -226,13 +222,11 @@ fun JourneyStatusPage(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     textDecoration = TextDecoration.Underline,
-                                    color = Color.Black
                                 )
                                 Text(
                                     text = nextStopName,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -288,7 +282,6 @@ fun JourneyStatusPage(
                 ElevatedButton(
                     modifier = Modifier,
                     onClick = {
-                        /*TODO: Create Note and add it to list*/
                         showAddNoteDialog = true
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
@@ -522,7 +515,7 @@ fun TimeTableListItem(
                 color = Color.DarkGray
             )
 
-            val formatter = SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+            val formatter = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale)
             val formattedTime: String = formatter.format(java.util.Date(timeStamp))
 
             Text(

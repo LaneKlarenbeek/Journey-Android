@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import com.example.journey.ui.theme.JourneyTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,9 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.journey.viewmodel.MainViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.journey.data.local.entity.JourneyRecord
+import com.example.journey.ui.theme.JourneyTheme
 import com.example.journey.ui.screens.HomePage
 import com.example.journey.ui.screens.JourneyStatusPage
 import com.example.journey.viewmodel.AppState
@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            JourneyTheme(darkTheme = false) {
+            JourneyTheme() {
 
                 // 1. This is the magic line. It continuously watches the ViewModel for changes.
                 val appState by mainViewModel.appState.collectAsState()
