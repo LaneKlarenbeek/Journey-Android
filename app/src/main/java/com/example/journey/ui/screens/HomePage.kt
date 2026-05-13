@@ -40,6 +40,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -220,7 +221,7 @@ fun HomePage(
                 NavigationBarItem(
                     selected = false,
                     onClick = {
-                       /*TODO: */
+                       /*TODO: Add page and logic for a Homepage that has recent statistics as well as customizable widgets.*/
                     },
                     label = { Text("Home \n(Coming Soon)", textAlign = TextAlign.Center) },
                     icon = {
@@ -228,9 +229,9 @@ fun HomePage(
                     }
                 )
                 NavigationBarItem(
-                    selected = showCompletedJourneys,
+                    selected = false,
                     onClick = {
-
+                        /*TODO: Add page and logic for adding a Roster of Residents.*/
                     },
                     label = { Text("Roster \n(Coming Soon)", textAlign = TextAlign.Center) },
                     icon = {
@@ -250,7 +251,7 @@ fun HomePage(
                 .padding(innerPadding)
         )
         {
-            //Spacer(modifier = Modifier.height(8.dp))
+            /*TODO: Put the welcome words inside of a styled bubble w/ 12p rounded courners.*/
             Text(
                 text = "Hello $userName!",
                 modifier = Modifier
@@ -268,8 +269,6 @@ fun HomePage(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(top = 4.dp)
             )
-            //Spacer(modifier = Modifier.height(16.dp))
-
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -282,12 +281,12 @@ fun HomePage(
                  * completed journey page based on button pressed
                  **************************/
                 if(showTemplateList){
+                    /*TODO: Create space where the column only goes to the top of the button*/
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp)
-                            //.weight(1f)
-                        ,
+                            .weight(1f),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         reverseLayout = true
                     ) {
@@ -309,13 +308,18 @@ fun HomePage(
                     //reverses the list so that the more recent data is displayed first
                     val displayedJourneys = remember(completedJourneys) { completedJourneys.reversed() }
 
+                    /*TODO: Create space where the column only goes to the top of the button*/
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp)
-                            .weight(1f),
+                            //.weight(1f)
+                        ,
+                        contentPadding = PaddingValues(
+                            top = 16.dp,
+                            bottom = 60.dp
+                        ),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        reverseLayout = true,
                     ) {
                         items(displayedJourneys) { journeyData ->
                             CompletedListItem(
