@@ -21,18 +21,7 @@ import com.example.journey.ui.theme.JourneyTheme
 fun LoginScreen(){
     Surface(
         modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    listOf(
-                        Color(0xFFD0AE90),
-                        Color(0xFF896A4E)
-                    ),
-                    startY = 0.0f,
-                    endY = Float.POSITIVE_INFINITY
-                )
-            ),
-        color = Color.Transparent
+            .fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,18 +41,7 @@ fun LoginScreenPreview(){
     JourneyTheme(darkTheme = false, dynamicColor = false) {
         Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            Color(0xFFD0AE90),
-                            Color(0xFF896A4E)
-                        ),
-                        startY = 0.0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                ),
-            color = Color.Transparent
+                .fillMaxSize(),
         ) {
             LoginScreen()
         }

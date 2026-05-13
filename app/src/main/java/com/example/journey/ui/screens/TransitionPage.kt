@@ -1,6 +1,5 @@
 package com.example.journey.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,16 +12,13 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,18 +45,7 @@ fun TransitionPage(
      ************************/
     Surface(
         modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    listOf(
-                        Color(0xFFD0AE90),
-                        Color(0xFF896A4E)
-                    ),
-                    startY = 0.0f,
-                    endY = Float.POSITIVE_INFINITY
-                )
-            ),
-        color = Color.Transparent
+            .fillMaxSize(),
     )
     {
         Column(
@@ -70,7 +55,6 @@ fun TransitionPage(
             Box(
                 modifier = Modifier
                     .windowInsetsPadding(WindowInsets.statusBars)
-                    .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
                     .padding(14.dp),
             ) {
                 Text(
@@ -87,7 +71,6 @@ fun TransitionPage(
             Spacer(modifier = Modifier.height(12.dp))
             Box(
                 modifier = Modifier
-                    .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
                     .padding(14.dp),
             ) {
                 Text(
@@ -110,16 +93,6 @@ fun TransitionPage(
                 label = { Text("First Name") },
                 shape = RoundedCornerShape(12),
                 maxLines = 1,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFF927155),
-                    unfocusedContainerColor = Color(0xFF927155),
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedLabelColor = Color.Black,
-                    unfocusedLabelColor = Color.Black,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
                 modifier = Modifier
                     .padding(12.dp),
             )
@@ -131,16 +104,6 @@ fun TransitionPage(
                 label = { Text("Last Name") },
                 shape = RoundedCornerShape(12),
                 maxLines = 1,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFF927155),
-                    unfocusedContainerColor = Color(0xFF927155),
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedLabelColor = Color.Black,
-                    unfocusedLabelColor = Color.Black,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
                 modifier = Modifier
                     .padding(12.dp),
             )
@@ -161,19 +124,13 @@ fun TransitionPage(
                         onContinueClick(firstName.trim(), lastName.trim())
                     }
                 },
-                //border = BorderStroke(2.dp, Color(0xFF927155)),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier,
-                colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = Color(0xFF927155),
-                    contentColor = Color.White
-                )
             ) {
                 Text(
                     text = "Continue",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
                 )
             }
         }
@@ -187,17 +144,6 @@ fun TransitionPagePreview(){
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            Color(0xFFD0AE90),
-                            Color(0xFF896A4E),
-                        ),
-                        startY = 0.0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                ),
-            color = Color.Transparent
         ) {
             TransitionPage(onContinueClick = { _, _ -> })
         }

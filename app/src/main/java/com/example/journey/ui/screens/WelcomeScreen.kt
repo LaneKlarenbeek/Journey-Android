@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,18 +39,7 @@ fun Login(
 
     Surface(
         modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    listOf(
-                        Color(0xFFD0AE90),
-                        Color(0xFF896A4E)
-                    ),
-                    startY = 0.0f,
-                    endY = Float.POSITIVE_INFINITY
-                )
-            ),
-        color = Color.Transparent
+            .fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,8 +51,7 @@ fun Login(
             Spacer(modifier = Modifier.height(23.dp))
             Box(
                 modifier = Modifier
-                        .background(color = Color(0xFF927155), shape = RoundedCornerShape(12.dp))
-                    .padding(14.dp),
+                    .padding(14.dp)
             ) {
                 Text(
                     text = "Welcome to Jou(R)ney!",
@@ -82,19 +69,13 @@ fun Login(
             Spacer(modifier = Modifier.height(12.dp))
             ElevatedButton(
                 onClick = onLoginClick,
-                //border = BorderStroke(2.dp, Color(0xFF927155)),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier,
-                colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = Color(0xFF927155),
-                    contentColor = Color.White
-                )
             ) {
                 Text(
                     text = "Login",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
                 )
             }
 
@@ -102,19 +83,13 @@ fun Login(
             Spacer(modifier = Modifier.height(12.dp))
             ElevatedButton(
                 onClick = onCreateAccountClick,
-                //border = BorderStroke(2.dp, Color(0xFF927155)),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier,
-                colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = Color(0xFF927155),
-                    contentColor = Color.White
-                )
             ) {
                 Text(
                     text = "Create Account",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
                 )
             }
 
@@ -122,19 +97,13 @@ fun Login(
             Spacer(modifier = Modifier.height(12.dp))
             ElevatedButton(
                 onClick = onGuestClick,
-                //border = BorderStroke(2.dp, Color(0xFF927155)),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier,
-                colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = Color(0xFF927155),
-                    contentColor = Color.White
-                )
             ) {
                 Text(
                     text = "Continue as Guest",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
                 )
             }
         }

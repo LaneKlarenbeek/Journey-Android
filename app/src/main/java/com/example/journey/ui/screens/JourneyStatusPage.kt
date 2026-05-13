@@ -49,6 +49,7 @@ import androidx.compose.runtime.setValue
 import java.text.SimpleDateFormat
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.platform.LocalLocale
+import java.util.Date
 
 data class ListObject(
     val name: String,
@@ -106,15 +107,11 @@ fun JourneyStatusPage(
     }
 
     Surface(
-        modifier = Modifier
-            .padding(14.dp)
-            .fillMaxSize(),
-    ){
 
+    ){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(10.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -123,14 +120,12 @@ fun JourneyStatusPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
-                    .background(color = Color.Transparent)
             ) {
                 Text(
                     text = activeJourney.journey.title,
                     modifier = Modifier
                         .width(200.dp)
-                        .fillMaxWidth()
-                        .background(color = Color(0xFF927155)),
+                        .fillMaxWidth(),
                     fontSize = 32.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
@@ -243,8 +238,6 @@ fun JourneyStatusPage(
                     .fillMaxWidth()
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                color = Color.Transparent,
-
             ){
                 LazyColumn(
                     modifier = Modifier
@@ -284,13 +277,11 @@ fun JourneyStatusPage(
                     onClick = {
                         showAddNoteDialog = true
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
                 ) {
                     Text(
                         text = "Note",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
                     )
                 }
 
@@ -313,21 +304,18 @@ fun JourneyStatusPage(
                             onEndClick()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0AE90))
                 ) {
                     if(currentStopIndex < stops.size){
                         Text(
                             text = "Next",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
                         )
                     } else if(currentStopIndex == stops.size){
                         Text(
                             text = "End",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
                         )
                     }
                 }
@@ -344,7 +332,6 @@ fun JourneyStatusPage(
                     Text(
                         text = "Cancel Journey?",
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF896A4E)
                     )
                 },
                 text = {
@@ -356,7 +343,6 @@ fun JourneyStatusPage(
                     TextButton(
                         onClick = {
                             showCancelDialog = false
-                            // THIS is where we finally tell MainActivity to wipe the data!
                             onCancelJourneyClick()
                         }
                     ) {
@@ -366,14 +352,12 @@ fun JourneyStatusPage(
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            // Just closes the window and lets them continue the round
                             showCancelDialog = false
                         }
                     ) {
                         Text("Resume", color = Color.Gray)
                     }
                 },
-                containerColor = Color.White
             )
         }
 
@@ -383,7 +367,6 @@ fun JourneyStatusPage(
             ){
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
@@ -396,7 +379,6 @@ fun JourneyStatusPage(
                             text = "Add Note",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF896A4E)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -406,10 +388,6 @@ fun JourneyStatusPage(
                             onValueChange = {newNoteName = it},
                             placeholder = { Text("e.g., Spotted mess on floor") },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF927155),
-                                focusedLabelColor = Color(0xFF927155)
-                            )
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -437,11 +415,6 @@ fun JourneyStatusPage(
                                         showAddNoteDialog = false
                                     }
                                 },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF927155
-                                    )
-                                )
                             ) {
                                 Text("Continue")
                             }
@@ -479,7 +452,13 @@ fun JourneyStatusPagePreview(){
 
     val testActiveJourney = JourneyRecordWithDetails(journey = activeJourneyRecord, stopsWithNotes = stops)
 
-    //JourneyStatusPage(activeJourney = testActiveJourney)
+    JourneyStatusPage(
+        testActiveJourney,
+        onCancelJourneyClick = {},
+        addNoteAction = { _, _ -> },
+        onNextClick = {},
+        onEndClick = {},
+    )
 }
 
 @Composable
@@ -490,7 +469,6 @@ fun TimeTableListItem(
 ){
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -505,25 +483,22 @@ fun TimeTableListItem(
                 modifier = Modifier.weight(1f),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
             )
 
             Text(
                 text = stop,
                 modifier = Modifier.weight(1.5f),
                 fontSize = 14.sp,
-                color = Color.DarkGray
             )
 
             val formatter = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale)
-            val formattedTime: String = formatter.format(java.util.Date(timeStamp))
+            val formattedTime: String = formatter.format(Date(timeStamp))
 
             Text(
                 text = formattedTime,
                 modifier = Modifier.weight(0.7f),
                 fontSize = 14.sp,
                 textAlign = TextAlign.End,
-                color = Color.Gray
             )
         }
     }
